@@ -9,4 +9,7 @@ int main() {
   for (ft::vector<int>::iterator iter = v.begin(), last = v.end(); iter != last; ++iter) {
     std::cout << *iter << std::endl;
   }
+  for (ft::vector<int>::reverse_iterator riter = v.rbegin(), last = v.rend(); riter != last; ++riter) {
+    std::cout << *riter << std::endl;
+  }
 }
