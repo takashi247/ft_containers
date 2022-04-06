@@ -7,6 +7,7 @@
 #include <stdexcept> // for out_of_range
 
 namespace ft {
+
 template <class T, class Allocator = std::allocator<T> >
 class vector {
  public :
@@ -125,8 +126,13 @@ class vector {
   }
 
   size_type max_size() const {
-    // Need to implement
-    return size();
+    size_type alloc_max = alloc_.max_size();
+    size_type diff_max = std::numeric_limits<difference_type>::max();
+    if (alloc_max <= diff_max) {
+      return alloc_max;
+    } else {
+      return diff_max;
+    }
   }
 
   void resize(size_type n, value_type val = value_type()) {
@@ -265,6 +271,7 @@ class vector {
   pointer reserved_last_;
   allocator_type alloc_;
 };
+
 }
 
 #endif
