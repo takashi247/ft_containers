@@ -10,6 +10,7 @@ namespace ft {
 
 template <class T, class Allocator = std::allocator<T> >
 class vector {
+
  public :
   typedef T value_type;
   typedef T* pointer;
@@ -55,14 +56,14 @@ class vector {
 
   // Destructor
 
-  ~vector() {
+  virtual ~vector() {
     clear();
     deallocate();
   }
 
   // Assignation operator
 
-  vector& operator =(const vector& x) {
+  vector& operator=(const vector& x) {
     if (this != &x) {
       if (size() == x.size()) {
         std::copy(x.begin(), x.end(), begin());
