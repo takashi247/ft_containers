@@ -5,6 +5,7 @@
 #include <iterator> // for reverse_iterator, distance
 #include <algorithm> // for copy
 #include <stdexcept> // for out_of_range
+#include "iterator.hpp"
 
 namespace ft {
 
@@ -22,8 +23,8 @@ class vector {
   typedef std::ptrdiff_t difference_type;
   typedef pointer iterator;
   typedef const_pointer const_iterator;
-  typedef std::reverse_iterator<iterator> reverse_iterator; // Need to implement ft::reverse_iterator
-  typedef std::reverse_iterator<const_iterator> const_reverse_iterator; // Need to implement ft::reverse_iterator
+  typedef ft::reverse_iterator<iterator> reverse_iterator;
+  typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
   // Constructor
 
