@@ -19,17 +19,17 @@ class vector_iterator : public std::iterator<std::random_access_iterator_tag, T>
   typedef std::ptrdiff_t difference_type;
 
   // Default constructor
-  vector_iterator() : v_ptr_(NULL), i_(0) {};
+  vector_iterator() : v_ptr_(NULL), i_(0) {}
 
   // Constructor
-  vector_iterator(ft::vector<T>* v_ptr, size_type i) : v_ptr_(v_ptr), i_(i) {};
+  vector_iterator(ft::vector<T>* v_ptr, size_type i) : v_ptr_(v_ptr), i_(i) {}
 
   vector_iterator(const vector_iterator& other) {
     v_ptr_ = other.v_ptr_;
     i_ = other.i_;
   }
 
-  virtual ~vector_iterator(){};
+  virtual ~vector_iterator(){}
 
   vector_iterator& operator =(const vector_iterator& other) {
     if (this != &other) {
