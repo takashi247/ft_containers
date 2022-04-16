@@ -17,11 +17,11 @@ class reverse_iterator : public std::iterator<
  public:
   // typedef-s
   typedef Iterator iterator_type;
-  typedef ft::iterator_traits<Iterator>::iterator_category iterator_category;
-  typedef ft::iterator_traits<Iterator>::value_type value_type;
-  typedef ft::iterator_traits<Iterator>::difference_type difference_type;
-  typedef ft::iterator_traits<Iterator>::pointer pointer;
-  typedef ft::iterator_traits<Iterator>::reference reference;
+  typedef typename ft::iterator_traits<Iterator>::iterator_category iterator_category;
+  typedef typename ft::iterator_traits<Iterator>::value_type value_type;
+  typedef typename ft::iterator_traits<Iterator>::difference_type difference_type;
+  typedef typename ft::iterator_traits<Iterator>::pointer pointer;
+  typedef typename ft::iterator_traits<Iterator>::reference reference;
 
   // Default constructor
   reverse_iterator() {}
@@ -89,6 +89,15 @@ class reverse_iterator : public std::iterator<
   // Base iterator must be a random-access iterator
   reference operator[](difference_type n) const { return *(*this + n); }
 
+  // helper functions
+  bool Eq(const reverse_iterator& rhs) const { return current == rhs.current; }
+
+  bool Lt(const reverse_iterator& rhs) const { return rhs.current < current; }
+
+  difference_type Mi(const reverse_iterator& rhs) const {
+    return rhs.current - current;
+  }
+
  protected:
   iterator_type current;
 };
@@ -98,19 +107,19 @@ class reverse_iterator : public std::iterator<
 template <class Iterator>
 bool operator==(const reverse_iterator<Iterator>& lhs,
                 const reverse_iterator<Iterator>& rhs) {
-  return lhs.current == rhs.current;
+  return lhs.Eq(rhs);
 }
 
 template <class Iterator>
 bool operator!=(const reverse_iterator<Iterator>& lhs,
                 const reverse_iterator<Iterator>& rhs) {
-  return !(lhs.current == rhs.current);
+  return !(lhs == rhs);
 }
 
 template <class Iterator>
 bool operator<(const reverse_iterator<Iterator>& lhs,
                 const reverse_iterator<Iterator>& rhs) {
-  return rhs.current < lhs.current;
+  return lhs.Lt(rhs);
 }
 
 template <class Iterator>
@@ -142,7 +151,7 @@ template <class Iterator>
 typename reverse_iterator<Iterator>::difference_type operator-(
     const reverse_iterator<Iterator>& lhs,
     const reverse_iterator<Iterator>& rhs) {
-  return rhs.current - lhs.current;
+  return lhs.Mi(rhs);
 }
 
 }
