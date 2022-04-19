@@ -33,3 +33,6 @@
 
 # Setting
 *.vscode
+
+# References
+ref/
