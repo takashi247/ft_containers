@@ -9,6 +9,7 @@
 #include "vector_iterator.hpp"
 #include "iterator_traits.hpp"
 #include "type_traits.hpp"
+#include "algorithm.hpp"
 
 namespace ft {
 
@@ -336,15 +337,22 @@ class vector {
   template <class _Iterator>
   void insert(iterator __position, _Iterator __first,
               typename ft::enable_if<!ft::is_integral<_Iterator>::value, _Iterator>::type __last) {
-    typedef typename ft::iterator_traits<_Iterator>::iterator_category __iterator_category;
-    if (typeid(__iterator_category) == typeid(std::input_iterator_tag)) {
-      __insert_input_range(__position, __first, __last);
-    } else if (typeid(__iterator_category) == typeid(std::forward_iterator_tag)
-               || typeid(__iterator_category) == typeid(std::bidirectional_iterator_tag)
-               || typeid(__iterator_category) == typeid(std::random_access_iterator_tag)) {
-      __insert_forward_range(__position, __first, __last);
-    }
+      __insert_range(__position, __first, __last,
+                     typename ft::iterator_traits<_Iterator>::iterator_category());
   }
+
+//  template <class _Iterator>
+//  void insert(iterator __position, _Iterator __first,
+//              typename ft::enable_if<!ft::is_integral<_Iterator>::value, _Iterator>::type __last) {
+//    typedef typename ft::iterator_traits<_Iterator>::iterator_category __iterator_category;
+//    if (typeid(__iterator_category) == typeid(std::input_iterator_tag)) {
+//      __insert_input_range(__position, __first, __last);
+//    } else if (typeid(__iterator_category) == typeid(std::forward_iterator_tag)
+//               || typeid(__iterator_category) == typeid(std::bidirectional_iterator_tag)
+//               || typeid(__iterator_category) == typeid(std::random_access_iterator_tag)) {
+//      __insert_forward_range(__position, __first, __last);
+//    }
+//  }
 
   iterator erase(iterator __position) {
     std::copy(__position + 1, end(), __position);
@@ -448,14 +456,16 @@ class vector {
   }
 
   template <class _Iterator>
-  void __insert_input_range(iterator __position, _Iterator __first, _Iterator __last) {
+  void __insert_range(iterator __position, _Iterator __first, _Iterator __last,
+                      std::input_iterator_tag) {
     for (; __first != __last; ++__first, ++__position) {
       __position = insert(__position, *__first);
     }
   }
 
   template <class _Iterator>
-  void __insert_forward_range(iterator __position, _Iterator __first, _Iterator __last) {
+  void __insert_range(iterator __position, _Iterator __first, _Iterator __last,
+                      std::forward_iterator_tag) {
     difference_type __n = std::distance(__first, __last);
     size_type __cap = capacity();
     size_type __ms = max_size();
@@ -508,6 +518,44 @@ class vector {
   }
 
 }; // class vector
+
+// Non-member functions
+
+template <class _Tp, class _Allocator>
+bool operator==(const vector<_Tp, _Allocator>& __x, const vector<_Tp, _Allocator>& __y) {
+  const typename vector<_Tp, _Allocator>::size_type __sz = __x.size();
+  return __sz == __y.size() && ft::equal(__x.begin(), __x.end(), __y.begin());
+}
+
+template <class _Tp, class _Allocator>
+bool operator!=(const vector<_Tp, _Allocator>& __x, const vector<_Tp, _Allocator>& __y) {
+  return !(__x == __y);
+}
+
+template <class _Tp, class _Allocator>
+bool operator< (const vector<_Tp, _Allocator>& __x, const vector<_Tp, _Allocator>& __y) {
+  return ft::lexicographical_compare(__x.begin(), __x.end(), __y.begin(), __y.end());
+}
+
+template <class _Tp, class _Allocator>
+bool operator> (const vector<_Tp, _Allocator>& __x, const vector<_Tp, _Allocator>& __y) {
+  return __y < __x;
+}
+
+template <class _Tp, class _Allocator>
+bool operator>=(const vector<_Tp, _Allocator>& __x, const vector<_Tp, _Allocator>& __y) {
+  return !(__x < __y);
+}
+
+template <class _Tp, class _Allocator>
+bool operator<=(const vector<_Tp, _Allocator>& __x, const vector<_Tp, _Allocator>& __y) {
+  return !(__y < __x);
+}
+
+template <class _Tp, class _Allocator>
+void swap(vector<_Tp, _Allocator>& __x, vector<_Tp, _Allocator>& __y) {
+  __x.swap(__y);
+}
 
 }
 
