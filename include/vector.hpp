@@ -7,6 +7,7 @@
 #include <stdexcept> // for out_of_range and length_error
 #include "iterator.hpp"
 #include "vector_iterator.hpp"
+#include "iterator_traits.hpp"
 #include "type_traits.hpp"
 
 namespace ft {
@@ -74,7 +75,7 @@ class vector {
   template <class _Iterator>
   vector(_Iterator __first,
          typename ft::enable_if<!ft::is_integral<_Iterator>::value, _Iterator>::type __last)
-    : __begin_(NULL), __end_(NULL), __end_cap_(NULL), __alloc_(NULL) {
+    : __begin_(NULL), __end_(NULL), __end_cap_(NULL), __alloc_() {
     insert(begin(), __first, __last);
   }
 
@@ -329,10 +330,20 @@ class vector {
     }
   }
 
+  // TODO: Why input iterators need to be handled separately?
+  // TODO: implement is_convertible
+
   template <class _Iterator>
   void insert(iterator __position, _Iterator __first,
               typename ft::enable_if<!ft::is_integral<_Iterator>::value, _Iterator>::type __last) {
-    __insert_range(__position, __first, __last, ft::iterator_traits<_Iterator>::iterator_category);
+    typedef typename ft::iterator_traits<_Iterator>::iterator_category __iterator_category;
+    if (typeid(__iterator_category) == typeid(std::input_iterator_tag)) {
+      __insert_input_range(__position, __first, __last);
+    } else if (typeid(__iterator_category) == typeid(std::forward_iterator_tag)
+               || typeid(__iterator_category) == typeid(std::bidirectional_iterator_tag)
+               || typeid(__iterator_category) == typeid(std::random_access_iterator_tag)) {
+      __insert_forward_range(__position, __first, __last);
+    }
   }
 
   iterator erase(iterator __position) {
@@ -437,21 +448,21 @@ class vector {
   }
 
   template <class _Iterator>
-  void __insert_range(iterator __position, _Iterator __first, _Iterator __last, std::input_iterator_tag) {
+  void __insert_input_range(iterator __position, _Iterator __first, _Iterator __last) {
     for (; __first != __last; ++__first, ++__position) {
       __position = insert(__position, *__first);
     }
   }
 
   template <class _Iterator>
-  void __insert_range(iterator __position, _Iterator __first, _Iterator __last, std::forward_iterator_tag) {
+  void __insert_forward_range(iterator __position, _Iterator __first, _Iterator __last) {
     difference_type __n = std::distance(__first, __last);
     size_type __cap = capacity();
     size_type __ms = max_size();
     size_type __s = size();
     if (__n == 0) {
       ;
-    } else if (__ms - __s < __n) {
+    } else if (__ms - __s < static_cast<size_type>(__n)) {
       __throw_length_error();
     } else if (__cap < __s + __n) {
       __cap = __ms - __cap / 2 < __cap ? 0 : __cap + __cap / 2;
@@ -476,7 +487,7 @@ class vector {
       __end_cap_ = __new_begin + __cap;
       __end_ = __new_begin + __s + __n;
       __begin_ = __new_begin;
-    } else if (static_cast<size_type>(end() - __position) < __n) {
+    } else if (end() - __position < __n) {
       __construct_to_copy(__position, end(), &(*__position) + __n);
       _Iterator __middle = __first;
       std::advance(__middle, end() - __position);
@@ -496,7 +507,7 @@ class vector {
     }
   }
 
-};
+}; // class vector
 
 }
 
