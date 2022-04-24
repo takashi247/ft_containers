@@ -332,7 +332,6 @@ class vector {
   }
 
   // TODO: Why input iterators need to be handled separately?
-  // TODO: implement is_convertible
 
   template <class _Iterator>
   void insert(iterator __position, _Iterator __first,
@@ -340,19 +339,6 @@ class vector {
       __insert_range(__position, __first, __last,
                      typename ft::iterator_traits<_Iterator>::iterator_category());
   }
-
-//  template <class _Iterator>
-//  void insert(iterator __position, _Iterator __first,
-//              typename ft::enable_if<!ft::is_integral<_Iterator>::value, _Iterator>::type __last) {
-//    typedef typename ft::iterator_traits<_Iterator>::iterator_category __iterator_category;
-//    if (typeid(__iterator_category) == typeid(std::input_iterator_tag)) {
-//      __insert_input_range(__position, __first, __last);
-//    } else if (typeid(__iterator_category) == typeid(std::forward_iterator_tag)
-//               || typeid(__iterator_category) == typeid(std::bidirectional_iterator_tag)
-//               || typeid(__iterator_category) == typeid(std::random_access_iterator_tag)) {
-//      __insert_forward_range(__position, __first, __last);
-//    }
-//  }
 
   iterator erase(iterator __position) {
     std::copy(__position + 1, end(), __position);
