@@ -29,6 +29,9 @@ class reverse_iterator : public std::iterator<
   explicit reverse_iterator(iterator_type it) : current(it) {}
 
   // Copy constructor
+
+  // TODO: Why don't we need to use enable_if and is_convertible to check if _Up is the valid type?
+
   template <class _Up>
   reverse_iterator(const reverse_iterator<_Up>& __u) : current(__u.base()) {}
 
