@@ -3,6 +3,8 @@
 
 #include "vector.hpp"
 
+namespace ft {
+
 template <class _Tp, class _Container = ft::vector<_Tp> >
 class stack {
  public:
@@ -78,6 +80,8 @@ template <class _Tp, class _Container>
 bool
 operator<=(const stack<_Tp, _Container>& __x, const stack<_Tp, _Container>& __y) {
   return !(__y < __x);
+}
+
 }
 
 #endif // STACK_HPP
