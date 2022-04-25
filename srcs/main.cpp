@@ -7,8 +7,10 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
+#include <stack>
 
 // std::vector<int> vec;
+// std::stack<int> stack;
 
 void print_ln(int elem) {
   std::cout << elem << std::endl;
