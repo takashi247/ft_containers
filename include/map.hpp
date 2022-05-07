@@ -186,6 +186,50 @@ class map {
 
 };
 
+// Non-member functions
+
+template <class _Key, class _Tp, class _Compare, class _Allocator>
+inline bool operator==(const map<_Key, _Tp, _Compare, _Allocator>& __x,
+                       const map<_Key, _Tp, _Compare, _Allocator>& __y) {
+  return __x.__tree_ == __y.__tree_;
+}
+
+template <class _Key, class _Tp, class _Compare, class _Allocator>
+inline bool operator!=(const map<_Key, _Tp, _Compare, _Allocator>& __x,
+                       const map<_Key, _Tp, _Compare, _Allocator>& __y) {
+  return !(__x == __y);
+}
+
+template <class _Key, class _Tp, class _Compare, class _Allocator>
+inline bool operator<(const map<_Key, _Tp, _Compare, _Allocator>& __x,
+                      const map<_Key, _Tp, _Compare, _Allocator>& __y) {
+  return __x.__tree_ < __y.__tree_;
+}
+
+template <class _Key, class _Tp, class _Compare, class _Allocator>
+inline bool operator>(const map<_Key, _Tp, _Compare, _Allocator>& __x,
+                      const map<_Key, _Tp, _Compare, _Allocator>& __y) {
+  return __y < __x;
+}
+
+template <class _Key, class _Tp, class _Compare, class _Allocator>
+inline bool operator<=(const map<_Key, _Tp, _Compare, _Allocator>& __x,
+                       const map<_Key, _Tp, _Compare, _Allocator>& __y) {
+  return !(__y < __x);
+}
+
+template <class _Key, class _Tp, class _Compare, class _Allocator>
+inline bool operator>=(const map<_Key, _Tp, _Compare, _Allocator>& __x,
+                       const map<_Key, _Tp, _Compare, _Allocator>& __y) {
+  return !(__x < __y);
+}
+
+template <class _Key, class _Tp, class _Compare, class _Allocator>
+inline void swap(map<_Key, _Tp, _Compare, _Allocator>& __x,
+                 map<_Key, _Tp, _Compare, _Allocator>& __y) {
+  __x.swap(__y);
+}
+
 }
 
 #endif // MAP_HPP

@@ -10,6 +10,7 @@
 #include "iterator.hpp"
 #include "utility.hpp"
 #include "iterator_traits.hpp"
+#include "algorithm.hpp"
 
 namespace ft {
 
@@ -25,11 +26,11 @@ struct __tree_traits {
 
 }; // __tree_traits
 
-template <class _Tree_traits>
+template <class _TreeTraits>
 struct __tree_node {
 
-  typedef typename _Tree_traits::value_type                              value_type;
-  typedef typename _Tree_traits::allocator_type                          allocator_type;
+  typedef typename _TreeTraits::value_type                              value_type;
+  typedef typename _TreeTraits::allocator_type                          allocator_type;
   typedef typename allocator_type::template rebind<void>::other::pointer void_pointer;
 
   struct __node {
@@ -43,16 +44,16 @@ struct __tree_node {
 
 };
 
-template <class _Tree_traits>
+template <class _TreeTraits>
 class __tree {
 
  public:
-  typedef __tree<_Tree_traits>                        tree;
-  typedef typename _Tree_traits::key_type             key_type;
-  typedef typename _Tree_traits::key_compare          key_compare;
-  typedef typename _Tree_traits::value_type           value_type;
-  typedef typename _Tree_traits::allocator_type       allocator_type;
-  typedef typename _Tree_traits::key_getter           key_getter;
+  typedef __tree<_TreeTraits>                        tree;
+  typedef typename _TreeTraits::key_type             key_type;
+  typedef typename _TreeTraits::key_compare          key_compare;
+  typedef typename _TreeTraits::value_type           value_type;
+  typedef typename _TreeTraits::allocator_type       allocator_type;
+  typedef typename _TreeTraits::key_getter           key_getter;
   typedef typename allocator_type::size_type          size_type;
   typedef typename allocator_type::difference_type    difference_type;
   typedef typename allocator_type::pointer            pointer;
@@ -61,8 +62,8 @@ class __tree {
   typedef typename allocator_type::const_reference    const_reference;
 
  protected:
-  typedef typename __tree_node<_Tree_traits>::void_pointer  void_pointer;
-  typedef typename __tree_node<_Tree_traits>::__node        node;
+  typedef typename __tree_node<_TreeTraits>::void_pointer  void_pointer;
+  typedef typename __tree_node<_TreeTraits>::__node        node;
 
   // TODO: Check enum naming convention
 
@@ -107,6 +108,9 @@ class __tree {
   static key_reference __key(node_pointer __p) {
     return key_getter()(__value(__p));
   }
+
+  // TODO: Understand why reinterpret_cast is required here
+  // Probably, void pointer needs to be casted by reinterpret_cast
 
   static node_pointer_reference __parent(node_pointer __p) {
     return reinterpret_cast<node_pointer_reference>((*__p).__parent_);
@@ -254,7 +258,7 @@ class __tree {
 
     __tree_const_iterator(node_pointer __p) : __node_ptr_(__p) {}
 
-    __tree_const_iterator(const typename __tree<_Tree_traits>::__tree_iterator& __x)
+    __tree_const_iterator(const typename __tree<_TreeTraits>::__tree_iterator& __x)
       : __node_ptr_(__x.__node_ptr_) {}
 
     const_reference operator*() const { return __value(__node_ptr_); }
@@ -927,6 +931,44 @@ class __tree {
   }
 
 }; // __tree class
+
+// Non-member functions
+
+template <class _TreeTraits>
+inline void swap(__tree<_TreeTraits>& __x,
+                 __tree<_TreeTraits>& __y) {
+  __x.swap(__y);
+}
+
+template <class _TreeTraits>
+inline bool operator==(const __tree<_TreeTraits>& __x, const __tree<_TreeTraits>& __y) {
+  return __x.size() == __y.size() && ft::equal(__x.begin(), __x.end(), __y.begin());
+}
+
+template <class _TreeTraits>
+inline bool operator!=(const __tree<_TreeTraits>& __x, const __tree<_TreeTraits>& __y) {
+  return !(__x == __y);
+}
+
+template <class _TreeTraits>
+inline bool operator<(const __tree<_TreeTraits>& __x, const __tree<_TreeTraits>& __y) {
+  return ft::lexicographical_compare(__x.begin(), __x.end(), __y.begin(), __y.end(), __x.value_comp());
+}
+
+template <class _TreeTraits>
+inline bool operator>(const __tree<_TreeTraits>& __x, const __tree<_TreeTraits>& __y) {
+  return __y < __x;
+}
+
+template <class _TreeTraits>
+inline bool operator<=(const __tree<_TreeTraits>& __x, const __tree<_TreeTraits>& __y) {
+  return !(__y < __x);
+}
+
+template <class _TreeTraits>
+inline bool operator>=(const __tree<_TreeTraits>& __x, const __tree<_TreeTraits>& __y) {
+  return !(__x < __y);
+}
 
 }
 
