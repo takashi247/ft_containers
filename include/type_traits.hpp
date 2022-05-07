@@ -60,6 +60,27 @@ template <>          struct __ft_is_integral<unsigned long> : public true_type {
 template <class _Tp>
 struct is_integral : public __ft_is_integral<typename remove_cv<_Tp>::type> {};
 
-}
+// type detectors
+
+template <class _Tp>
+struct __identity {
+  _Tp& operator()(_Tp& __x) const { return __x; }
+
+  const _Tp& operator()(const _Tp& __x) const { return __x; }
+};
+
+template <class _Tp>
+struct __identity<const _Tp> : __identity<_Tp> {};
+
+template <class _Pair>
+struct __select_first {
+  typename _Pair::first_type& operator()(_Pair& __x) const { return __x.first; }
+
+  const typename _Pair::first_type& operator()(const _Pair& __x) const {
+    return __x.first;
+  }
+};
+
+} // namespace ft
 
 #endif // TYPE_TRAITS_HPP
