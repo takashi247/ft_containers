@@ -2,49 +2,35 @@
 #define __TREE_HPP
 
 #include <iterator> // for bidirectional iterator tag, distance
-#include "iterator.hpp"
-#include "utility.hpp"
-#include "iterator_traits.hpp"
 #include <limits> // for numeric_limits
 #include <algorithm> // for min, swap
 #include <memory> // for allocator max_size function
 #include <stdexcept> // for length_error, out_of_range
 
+#include "iterator.hpp"
+#include "utility.hpp"
+#include "iterator_traits.hpp"
+
 namespace ft {
 
 template <class _Key, class _Tp, class _KeyGetter, class _Compare,
           class _Allocator = std::allocator<_Tp> >
-class __tree_traits {
- public:
-  typedef _Key                                                    key_type;
-  typedef _Tp                                                     value_type;
-  typedef _KeyGetter                                              key_getter;
-  typedef _Compare                                                key_compare;
-  typedef typename _Allocator::template rebind<value_type>::other allocator_type;
+struct __tree_traits {
 
-  __tree_traits() : comp() {}
-
-  explicit __tree_traits(_Compare __comp) : comp(__comp) {}
-
-  virtual ~__tree_traits() {}
-
-  // Member variable
-  // TODO: Check if it's ok to declare this as protected
-
-  key_compare comp;
+  typedef _Key       key_type;
+  typedef _Tp        value_type;
+  typedef _KeyGetter key_getter;
+  typedef _Compare   key_compare;
+  typedef _Allocator allocator_type;
 
 }; // __tree_traits
 
 template <class _Tree_traits>
-class __tree_node : public _Tree_traits {
+struct __tree_node {
 
- protected:
-  typedef typename _Tree_traits::allocator_type                        allocator_type;
-  typedef typename _Tree_traits::key_compare                           key_compare;
-  typedef typename _Tree_traits::value_type                            value_type;
+  typedef typename _Tree_traits::value_type                              value_type;
+  typedef typename _Tree_traits::allocator_type                          allocator_type;
   typedef typename allocator_type::template rebind<void>::other::pointer void_pointer;
-
-  // TODO: Check if __node class needs to be declared as friend
 
   struct __node {
     void_pointer __parent_;
@@ -55,78 +41,24 @@ class __tree_node : public _Tree_traits {
     bool __isnil_;
   };
 
-  // Constructor
-
-  __tree_node(const key_compare& __comp, allocator_type __a)
-    : _Tree_traits(__comp), __alloc_node_(__a) {}
-
-  virtual ~__tree_node() {}
-
-  // Member variables
-
-  typename allocator_type::template rebind<__node>::other __alloc_node_;
-
 };
 
 template <class _Tree_traits>
-class __tree_pointer : public __tree_node<_Tree_traits> {
-
- protected:
-  typedef typename __tree_node<_Tree_traits>::__node                     node;
-  typedef typename _Tree_traits::allocator_type                          allocator_type;
-  typedef typename _Tree_traits::key_compare                             key_compare;
-  typedef typename allocator_type::template rebind<node>::other::pointer node_pointer;
-
-  // Constructor
-
-  __tree_pointer(const key_compare& __comp, allocator_type __a)
-    : __tree_node<_Tree_traits>(__comp, __a), __alloc_node_pointer_(__a) {}
-
-  virtual ~__tree_pointer() {}
-
-  // Member variables
-
-  typename allocator_type::template rebind<node_pointer>::other __alloc_node_pointer_;
-
-};
-
-template <class _Tree_traits>
-class __tree_value : public __tree_pointer<_Tree_traits> {
-
- protected:
-  typedef typename _Tree_traits::allocator_type allocator_type;
-  typedef typename _Tree_traits::key_compare    key_compare;
-
-  // Constructor
-
-  __tree_value(const key_compare& __comp, allocator_type __a)
-    : __tree_pointer<_Tree_traits>(__comp, __a), __alloc_value_(__a) {}
-
-  virtual ~__tree_value() {}
-
-  // Member variables
-
-  allocator_type __alloc_value_;
-
-};
-
-template <class _Tree_traits>
-class __tree : public __tree_value<_Tree_traits> {
+class __tree {
 
  public:
-  typedef __tree<_Tree_traits>                  tree;
-  typedef __tree_value<_Tree_traits>            tree_value;
-  typedef typename _Tree_traits::key_type       key_type;
-  typedef typename _Tree_traits::key_compare    key_compare;
-  typedef typename _Tree_traits::value_type     value_type;
-  typedef typename _Tree_traits::allocator_type allocator_type;
-  typedef typename _Tree_traits::key_getter     key_getter;
+  typedef __tree<_Tree_traits>                        tree;
+  typedef typename _Tree_traits::key_type             key_type;
+  typedef typename _Tree_traits::key_compare          key_compare;
+  typedef typename _Tree_traits::value_type           value_type;
+  typedef typename _Tree_traits::allocator_type       allocator_type;
+  typedef typename _Tree_traits::key_getter           key_getter;
   typedef typename allocator_type::size_type          size_type;
   typedef typename allocator_type::difference_type    difference_type;
-  typedef typename allocator_type::template rebind<value_type>::other::pointer pointer;
-  typedef typename allocator_type::template rebind<value_type>::other::const_pointer const_pointer;
-  typedef typename allocator_type::template rebind<value_type>::other::reference reference;
-  typedef typename allocator_type::template rebind<value_type>::other::const_reference const_reference;
+  typedef typename allocator_type::pointer            pointer;
+  typedef typename allocator_type::const_pointer      const_pointer;
+  typedef typename allocator_type::reference          reference;
+  typedef typename allocator_type::const_reference    const_reference;
 
  protected:
   typedef typename __tree_node<_Tree_traits>::void_pointer  void_pointer;
@@ -153,9 +85,9 @@ class __tree : public __tree_value<_Tree_traits> {
   node_pointer __head_;
   size_type __size_;
   key_compare __comp_;
+  allocator_type __alloc_value_;
   typename allocator_type::template rebind<node>::other __alloc_node_;
   typename allocator_type::template rebind<node_pointer>::other __alloc_node_pointer_;
-  allocator_type __alloc_value_;
 
 
   // TODO: Why these functions need to be static?
@@ -404,18 +336,20 @@ class __tree : public __tree_value<_Tree_traits> {
   typedef ft::pair<__tree_const_iterator, __tree_const_iterator> pair_cc;
 
   __tree(const key_compare& __comp, const allocator_type& __a)
-    : tree_value(__comp, __a) {
+    : __comp_(__comp), __alloc_value_(__a), __alloc_node_(__a), __alloc_node_pointer_(__a) {
     __init();
   }
 
   __tree(const value_type *__first, const value_type *__last,
          const key_compare& __comp, const allocator_type& __a)
-      : tree_value(__comp, __a) {
+    : __comp_(__comp), __alloc_value_(__a), __alloc_node_(__a), __alloc_node_pointer_(__a) {
     __init();
     insert(__first, __last);
   }
 
-  __tree(const tree& __t) : tree_value(__t.key_comp(), __t.get_allocator()) {
+  __tree(const tree& __t)
+    : __comp_(__t.key_comp()), __alloc_value_(__t.get_allocator()),
+      __alloc_node_(__t.get_allocator()), __alloc_node_pointer_(__t.get_allocator()) {
     __init();
     __copy(__t);
   }
@@ -455,15 +389,15 @@ class __tree : public __tree_value<_Tree_traits> {
 
   size_type max_size() const {
     return std::min<size_type>(
-           tree_value::__alloc_value_.max_size(),
+           __alloc_value_.max_size(),
            std::numeric_limits<difference_type>::max());
   }
 
   bool empty() const { return size() == 0; }
 
-  allocator_type get_allocator() const { return tree_value::__alloc_value_; }
+  allocator_type get_allocator() const { return __alloc_value_; }
 
-  key_compare key_comp() const { return _Tree_traits::comp; }
+  key_compare key_comp() const { return __comp_; }
 
   // First, identify the point where __v should be added
   // Next, check if __v already exists in the tree
@@ -474,7 +408,7 @@ class __tree : public __tree_value<_Tree_traits> {
     bool __add_left = true;
     while (!__isnil(__x)) {
       __y = __x;
-      __add_left = _Tree_traits::comp(key_getter()(__v), __key(__x));
+      __add_left = __comp_(key_getter()(__v), __key(__x));
       __x = __add_left ? __left(__x) : __right(__x);
     }
     iterator __it = iterator(__y);
