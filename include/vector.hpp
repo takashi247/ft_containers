@@ -349,9 +349,9 @@ class vector {
 
   iterator erase(iterator __first, iterator __last) {
     if (__first != __last) {
-      pointer __new_end = std::copy(__last, end(), __first);
-      __destroy(__new_end, __end_);
-      __end_ = __new_end;
+      iterator __new_end = std::copy(__last, end(), __first);
+      __destroy(__new_end.base(), __end_);
+      __end_ = __new_end.base();
     }
     return __first;
   }
