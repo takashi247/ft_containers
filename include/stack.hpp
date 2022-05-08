@@ -30,7 +30,7 @@ class stack {
     return *this;
   }
 
-  virtual ~stack();
+  virtual ~stack() {}
 
   bool empty() const { return c.empty(); }
 
@@ -44,6 +44,15 @@ class stack {
 
   void pop() { c.pop_back(); }
 
+  template <class T1, class _C1>
+  friend
+  bool
+  operator==(const stack<T1, _C1>& __x, const stack<T1, _C1>& __y);
+
+  template <class T1, class _C1>
+  friend
+  bool
+  operator< (const stack<T1, _C1>& __x, const stack<T1, _C1>& __y);
 };
 
 template <class _Tp, class _Container>
