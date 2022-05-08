@@ -5,6 +5,8 @@
 #include <iterator> // for reverse_iterator, distance
 #include <algorithm> // for copy, min
 #include <stdexcept> // for out_of_range and length_error
+#include <limits> // for numeric_limits
+
 #include "iterator.hpp"
 #include "vector_iterator.hpp"
 #include "iterator_traits.hpp"
@@ -172,8 +174,8 @@ class vector {
   }
 
   size_type max_size() const {
-    return std::min<size_type>(__alloc_.max_size(),
-                               std::numeric_limits<difference_type>::max());
+    return std::min(__alloc_.max_size(),
+                    static_cast<size_type>(std::numeric_limits<difference_type>::max()));
   }
 
   void resize(size_type __sz) {
@@ -291,7 +293,7 @@ class vector {
     } else if (__ms - __s < __n) {
       __throw_length_error();
     } else if (__cap < __s + __n) {
-      __cap = __ms - __cap / 2 < __cap ? 0 : __cap + __cap / 2;
+      __cap = __ms - __cap < __cap ? 0 : __cap + __cap;
       if (__cap < __s + __n) {
         __cap = __s + __n;
       }

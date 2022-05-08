@@ -95,13 +95,13 @@ class map {
 
   const_iterator end() const { return __tree_.end(); }
 
-  reverse_iterator rbegin() { return reverse_iterator(end()); }
+  reverse_iterator rbegin() { return __tree_.rbegin(); }
 
-  const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
+  const_reverse_iterator rbegin() const { return __tree_.rbegin(); }
 
-  reverse_iterator rend() {return reverse_iterator(begin()); }
+  reverse_iterator rend() {return __tree_.rend(); }
 
-  const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
+  const_reverse_iterator rend() const { return __tree_.rend(); }
 
   // Capacity
 
@@ -183,6 +183,15 @@ class map {
   // Allocator
 
   allocator_type get_allocator() const { return __tree_.get_allocator(); }
+
+  // Non-member functions
+  template <class _K1, class _T1, class _C1, class _A1>
+  friend bool operator==(const map<_K1, _T1, _C1, _A1>& __x,
+                         const map<_K1, _T1, _C1, _A1>& __y);
+
+  template <class _K1, class _T1, class _C1, class _A1>
+  friend bool operator< (const map<_K1, _T1, _C1, _A1>& __x,
+                         const map<_K1, _T1, _C1, _A1>& __y);
 
 };
 

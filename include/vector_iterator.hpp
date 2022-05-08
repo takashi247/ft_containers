@@ -37,9 +37,7 @@ class vector_iterator {
 
   template <class _Up>
   vector_iterator& operator=(const vector_iterator<_Up>& __u) {
-    if (this != &__u) {
-      __i_ = __u.__i_;
-    }
+    __i_ = __u.base();
     return *this;
   }
 

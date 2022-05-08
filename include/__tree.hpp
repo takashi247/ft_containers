@@ -29,14 +29,13 @@ struct __tree_traits {
 template <class _TreeTraits>
 struct __tree_node {
 
-  typedef typename _TreeTraits::value_type                              value_type;
   typedef typename _TreeTraits::allocator_type                          allocator_type;
-  typedef typename allocator_type::template rebind<void>::other::pointer void_pointer;
+  typedef typename allocator_type::value_type                              value_type;
 
   struct __node {
-    void_pointer __parent_;
-    void_pointer __left_;
-    void_pointer __right_;
+    __node* __parent_;
+    __node* __left_;
+    __node* __right_;
     value_type __value_;
     char __color_;
     bool __isnil_;
@@ -62,7 +61,6 @@ class __tree {
   typedef typename allocator_type::const_reference    const_reference;
 
  protected:
-  typedef typename __tree_node<_TreeTraits>::void_pointer  void_pointer;
   typedef typename __tree_node<_TreeTraits>::__node        node;
 
   // TODO: Check enum naming convention
@@ -78,8 +76,6 @@ class __tree {
     node_pointer_reference;
   typedef typename allocator_type::template rebind<key_type>::other::const_reference
     key_reference;
-  typedef typename allocator_type::template rebind<value_type>::other::reference
-    value_reference;
 
   // Member variables
 
@@ -101,27 +97,27 @@ class __tree {
     return (*__p).__isnil_;
   }
 
-  static value_reference __value(node_pointer __p) {
-    return static_cast<value_reference>((*__p).__value_);
+  static reference __value(node_pointer __p) {
+    return (*__p).__value_;
   }
 
   static key_reference __key(node_pointer __p) {
-    return key_getter()(__value(__p));
+    return key_getter()(__p->__value_);
   }
 
   // TODO: Understand why reinterpret_cast is required here
   // Probably, void pointer needs to be casted by reinterpret_cast
 
   static node_pointer_reference __parent(node_pointer __p) {
-    return reinterpret_cast<node_pointer_reference>((*__p).__parent_);
+    return (*__p).__parent_;
   }
 
   static node_pointer_reference __left(node_pointer __p) {
-    return reinterpret_cast<node_pointer_reference>((*__p).__left_);
+    return (*__p).__left_;
   }
 
   static node_pointer_reference __right(node_pointer __p) {
-    return reinterpret_cast<node_pointer_reference>((*__p).__right_);
+    return (*__p).__right_;
   }
 
  public:
@@ -154,7 +150,7 @@ class __tree {
 
     __tree_iterator(node_pointer __p) : __node_ptr_(__p) {}
 
-    reference operator*() const { return __value(__node_ptr_); }
+    reference operator*() const { return __node_ptr_->__value_; }
 
     pointer operator->() const { return &**this; }
 
@@ -243,7 +239,7 @@ class __tree {
    public:
     typedef std::iterator<std::bidirectional_iterator_tag, value_type,
                           difference_type, const_pointer, const_reference> iterator_base;
-    typedef typename ft::iterator_traits<iterator_base>::iterator_catetory iterator_category;
+    typedef typename ft::iterator_traits<iterator_base>::iterator_category iterator_category;
     typedef typename ft::iterator_traits<iterator_base>::value_type        value_type;
     typedef typename ft::iterator_traits<iterator_base>::difference_type   difference_type;
     typedef typename ft::iterator_traits<iterator_base>::pointer           pointer;
@@ -261,9 +257,9 @@ class __tree {
     __tree_const_iterator(const typename __tree<_TreeTraits>::__tree_iterator& __x)
       : __node_ptr_(__x.__node_ptr_) {}
 
-    const_reference operator*() const { return __value(__node_ptr_); }
+    reference operator*() const { return __node_ptr_->__value_; }
 
-    const_pointer operator->() const { return &**this; }
+    pointer operator->() const { return &**this; }
 
     __tree_const_iterator& operator++() {
       __increment();
@@ -297,11 +293,9 @@ class __tree {
 
    private:
 
-    // TODO: Check if this __decrement implementation causes any issues
-
     void __decrement() {
       if (__isnil(__node_ptr_)) {
-        ;
+        __node_ptr_ = __right(__node_ptr_);
       } else if (!__isnil(__left(__node_ptr_))) {
         __node_ptr_ = __max(__left(__node_ptr_));
       } else {
@@ -392,9 +386,9 @@ class __tree {
   size_type size() const { return __size_; }
 
   size_type max_size() const {
-    return std::min<size_type>(
-           __alloc_value_.max_size(),
-           std::numeric_limits<difference_type>::max());
+    return std::min(
+           __alloc_node_.max_size(),
+           static_cast<size_type>(std::numeric_limits<difference_type>::max()));
   }
 
   bool empty() const { return size() == 0; }
@@ -590,7 +584,7 @@ class __tree {
       }
       __color(__replace) = Black;
     }
-    __destval(&__value(__target_copy));
+    __destval(&(__target_copy->__value_));
     __freenode(__target_copy);
     if (0 < __size_) {
       --__size_;
@@ -831,7 +825,7 @@ class __tree {
     if (!__isnil(__x)) {
       node_pointer __y = __buynode(__parent_ptr, __color(__x));
       try {
-        __consval(&__value(__y), __value(__x));
+        __consval(&(__y->__value_), __x->__value_);
       } catch (...) {
         __freenode(__y);
         __erase(__r);
@@ -857,7 +851,7 @@ class __tree {
     for (node_pointer __y = __x; !__isnil(__y); __x = __y) {
       __erase(__right(__y));
       __y = __left(__y);
-      __destval(&__value(__x));
+      __destval(&(__x->__value_));
       __freenode(__x);
     }
   }
@@ -870,7 +864,7 @@ class __tree {
     __left(__z) = __head_;
     __right(__z) = __head_;
     try {
-      __consval(&__value(__z), __v);
+      __consval(&(__z->__value_), __v);
     } catch (...) {
       __freenode(__z);
       throw;
@@ -952,7 +946,7 @@ inline bool operator!=(const __tree<_TreeTraits>& __x, const __tree<_TreeTraits>
 
 template <class _TreeTraits>
 inline bool operator<(const __tree<_TreeTraits>& __x, const __tree<_TreeTraits>& __y) {
-  return ft::lexicographical_compare(__x.begin(), __x.end(), __y.begin(), __y.end(), __x.value_comp());
+  return ft::lexicographical_compare(__x.begin(), __x.end(), __y.begin(), __y.end());
 }
 
 template <class _TreeTraits>

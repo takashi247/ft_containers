@@ -49,7 +49,6 @@ int main() {
 
   ft::vector<int> v4(isIt, isItEnd);
   std::for_each(v4.begin(), v4.end(), print_ln);
-  */
 
   ft::map<char,int> mymap;
 
@@ -81,6 +80,21 @@ int main() {
   std::cout << "anothermap contains:\n";
   for (it=anothermap.begin(); it!=anothermap.end(); ++it)
     std::cout << it->first << " => " << it->second << '\n';
+  */
+
+  ft::vector<std::string> Z1;
+  ft::vector<std::string> Z2;
+
+  Z1.insert(Z1.begin(), 10, "test");
+  Z2.insert(Z2.begin(), Z1.begin(), Z1.end());
+
+  for (ft::vector<std::string>::iterator it = Z1.begin(), end = Z1.end(); it != end; ++it) {
+    std::cout << *it << std::endl;
+  }
+
+  for (ft::vector<std::string>::iterator it = Z2.begin(), end = Z2.end(); it != end; ++it) {
+    std::cout << *it << std::endl;
+  }
 
   return 0;
 }
