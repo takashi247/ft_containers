@@ -29,39 +29,251 @@ struct __tree_traits {
 template <class _TreeTraits>
 struct __tree_node {
 
-  typedef typename _TreeTraits::allocator_type                          allocator_type;
-  typedef typename allocator_type::value_type                              value_type;
+  typedef typename _TreeTraits::allocator_type  allocator_type;
+  typedef typename allocator_type::value_type   value_type;
+  typedef __tree_node*                          node_pointer;
 
-  struct __node {
-    __node* __parent_;
-    __node* __left_;
-    __node* __right_;
-    value_type __value_;
-    char __color_;
-    bool __isnil_;
-  };
+  value_type __value_;
+  node_pointer __parent_;
+  node_pointer __left_;
+  node_pointer __right_;
+  char __color_;
+  bool __isnil_;
+
+  __tree_node()
+    : __value_(), __parent_(NULL), __left_(NULL), __right_(NULL), __color_(), __isnil_(true)
+  {}
+
+  __tree_node(const value_type& __value)
+    : __value_(__value), __parent_(NULL), __left_(NULL), __right_(NULL), __color_(), __isnil_(false)
+  {}
+
+  node_pointer max_node() {
+    node_pointer __p = this;
+    while (!(__p->__right_->__isnil_)) {
+      __p = __p->__right_;
+    }
+    return __p;
+  }
+
+  node_pointer min_node() {
+    node_pointer __p = this;
+    while (!(__p->__left_->__isnil_)) {
+      __p = __p->__left_;
+    }
+    return __p;
+  }
+
+  node_pointer next_node() {
+    if (this->__isnil_) {
+      return this;
+    } else if (!(this->__right_->__isnil_)) {
+      return this->__right_->min_node();
+    } else {
+      node_pointer __tmp = this;
+      node_pointer __p = __tmp->__parent_;
+      while (!(__p->__isnil_) && __tmp == __p->__right_) {
+        __tmp = __p;
+        __p = __tmp->__parent_;
+      }
+      return __p;
+    }
+  }
+
+  node_pointer prev_node() {
+    if (this->__isnil_) {
+      return this->__right_; // TODO: Why this works?
+    } else if (!(this->__left_->__isnil_)) {
+      return this->__left_->max_node();
+    } else {
+      node_pointer __tmp = this;
+      node_pointer __p = __tmp->__parent_;
+      while (!(__p->__isnil_) && __tmp == __p->__left_) {
+        __tmp = __p;
+        __p = __tmp->__parent_;
+      }
+      return __p;
+    }
+  }
 
 };
+
+template <class _TreeTraits>
+class __tree_iterator {
+ public:
+  typedef typename std::bidirectional_iterator_tag     iterator_category;
+  typedef typename _TreeTraits::allocator_type         allocator_type;
+  typedef typename allocator_type::value_type          value_type;
+  typedef typename allocator_type::difference_type     difference_type;
+  typedef typename allocator_type::pointer             pointer;
+  typedef typename allocator_type::reference           reference;
+
+  typedef __tree_node<_TreeTraits>                  node;
+  typedef node*                                     node_pointer;
+
+ private:
+  node_pointer __node_ptr_;
+
+ public:
+  __tree_iterator() : __node_ptr_(NULL) {}
+
+  __tree_iterator(node_pointer __p) : __node_ptr_(__p) {}
+
+  __tree_iterator(const __tree_iterator& __x)
+    : __node_ptr_(__x.base()) {}
+
+  __tree_iterator& operator=(const __tree_iterator& __x) {
+    __node_ptr_ = __x.base();
+    return *this;
+  }
+
+  ~__tree_iterator() {}
+
+  reference operator*() const { return __node_ptr_->__value_; }
+
+  pointer operator->() const { return &**this; }
+
+  __tree_iterator& operator++() {
+    __node_ptr_ = __node_ptr_->next_node();
+    return *this;
+  }
+
+  __tree_iterator operator++(int) {
+    __tree_iterator __tmp = *this;
+    ++*this;
+    return __tmp;
+  }
+
+  __tree_iterator& operator--() {
+    __node_ptr_ = __node_ptr_->prev_node();
+    return *this;
+  }
+
+  __tree_iterator operator--(int) {
+    __tree_iterator __tmp = *this;
+    --*this;
+    return __tmp;
+  }
+
+  bool operator==(const __tree_iterator& __x) const {
+    return __node_ptr_ == __x.base();
+  }
+
+  bool operator!=(const __tree_iterator& __x) const {
+    return !(*this == __x);
+  }
+
+  node_pointer base() const { return __node_ptr_; }
+
+}; // __tree_iterator class
+
+template <class _TreeTraits>
+class __tree_const_iterator {
+ public:
+  typedef typename std::bidirectional_iterator_tag     iterator_category;
+  typedef typename _TreeTraits::allocator_type         allocator_type;
+  typedef typename allocator_type::value_type          value_type;
+  typedef typename allocator_type::difference_type     difference_type;
+  typedef typename allocator_type::const_pointer       pointer;
+  typedef typename allocator_type::const_reference     reference;
+
+  typedef __tree_node<_TreeTraits>                  node;
+  typedef node*                                     node_pointer;
+
+ private:
+  typedef __tree_iterator<_TreeTraits> non_const_iterator;
+
+  node_pointer __node_ptr_;
+
+ public:
+  __tree_const_iterator() : __node_ptr_(NULL) {}
+
+  __tree_const_iterator(node_pointer __p) : __node_ptr_(__p) {}
+
+  __tree_const_iterator(const non_const_iterator& __x)
+    : __node_ptr_(__x.base()) {}
+
+  __tree_const_iterator& operator=(const __tree_const_iterator& __x) {
+    __node_ptr_ = __x.base();
+    return *this;
+  }
+
+  ~__tree_const_iterator() {}
+
+  reference operator*() const { return __node_ptr_->__value_; }
+
+  pointer operator->() const { return &**this; }
+
+  __tree_const_iterator& operator++() {
+    __node_ptr_ = __node_ptr_->next_node();
+    return *this;
+  }
+
+  __tree_const_iterator operator++(int) {
+    __tree_const_iterator __tmp = *this;
+    ++*this;
+    return __tmp;
+  }
+
+  __tree_const_iterator& operator--() {
+    __node_ptr_ = __node_ptr_->prev_node();
+    return *this;
+  }
+
+  __tree_const_iterator operator--(int) {
+    __tree_const_iterator __tmp = *this;
+    --*this;
+    return __tmp;
+  }
+
+  bool operator==(const __tree_const_iterator& __x) const {
+    return __node_ptr_ == __x.base();
+  }
+
+  bool operator!=(const __tree_const_iterator& __x) const {
+    return !(*this == __x);
+  }
+
+  node_pointer base() const { return __node_ptr_; }
+
+}; // __tree_const_iterator
 
 template <class _TreeTraits>
 class __tree {
 
  public:
-  typedef __tree<_TreeTraits>                        tree;
-  typedef typename _TreeTraits::key_type             key_type;
-  typedef typename _TreeTraits::key_compare          key_compare;
-  typedef typename _TreeTraits::value_type           value_type;
-  typedef typename _TreeTraits::allocator_type       allocator_type;
-  typedef typename _TreeTraits::key_getter           key_getter;
+  typedef __tree<_TreeTraits>                         tree;
+  typedef typename _TreeTraits::key_type              key_type;
+  // typedef key_type&                                   key_reference; // TODO: Why this does not work?
+  typedef typename _TreeTraits::key_compare           key_compare;
+  typedef typename _TreeTraits::value_type            value_type;
+  typedef typename _TreeTraits::allocator_type        allocator_type;
+  typedef typename _TreeTraits::key_getter            key_getter;
   typedef typename allocator_type::size_type          size_type;
   typedef typename allocator_type::difference_type    difference_type;
   typedef typename allocator_type::pointer            pointer;
   typedef typename allocator_type::const_pointer      const_pointer;
   typedef typename allocator_type::reference          reference;
   typedef typename allocator_type::const_reference    const_reference;
+  typedef __tree_iterator<_TreeTraits>                iterator;
+  typedef __tree_const_iterator<_TreeTraits>          const_iterator;
+  typedef ft::reverse_iterator<iterator>              reverse_iterator;
+  typedef ft::reverse_iterator<const_iterator>        const_reverse_iterator;
+
+  typedef __tree_node<_TreeTraits>
+    node;
+  typedef typename allocator_type::template rebind<node>::other::pointer
+    node_pointer;
+  typedef typename allocator_type::template rebind<node_pointer>::other::reference
+    node_pointer_reference;
+  typedef typename allocator_type::template rebind<key_type>::other::const_reference
+    key_reference; // TODO: Why this works instead of above?
+
+  typedef ft::pair<iterator, bool>                    pair_ib;
+  typedef ft::pair<iterator, iterator>                pair_ii;
+  typedef ft::pair<const_iterator, const_iterator>    pair_cc;
 
  protected:
-  typedef typename __tree_node<_TreeTraits>::__node        node;
 
   // TODO: Check enum naming convention
 
@@ -69,13 +281,6 @@ class __tree {
     Red,
     Black
   };
-
-  typedef typename allocator_type::template rebind<node>::other::pointer
-    node_pointer;
-  typedef typename allocator_type::template rebind<node_pointer>::other::reference
-    node_pointer_reference;
-  typedef typename allocator_type::template rebind<key_type>::other::const_reference
-    key_reference;
 
   // Member variables
 
@@ -86,252 +291,11 @@ class __tree {
   typename allocator_type::template rebind<node>::other __alloc_node_;
   typename allocator_type::template rebind<node_pointer>::other __alloc_node_pointer_;
 
-
-  // TODO: Why these functions need to be static?
-
-  static char& __color(node_pointer __p) {
-    return (*__p).__color_;
-  }
-
-  static bool& __isnil(node_pointer __p) {
-    return (*__p).__isnil_;
-  }
-
-  static reference __value(node_pointer __p) {
-    return (*__p).__value_;
-  }
-
   static key_reference __key(node_pointer __p) {
     return key_getter()(__p->__value_);
   }
 
-  // TODO: Understand why reinterpret_cast is required here
-  // Probably, void pointer needs to be casted by reinterpret_cast
-
-  static node_pointer_reference __parent(node_pointer __p) {
-    return (*__p).__parent_;
-  }
-
-  static node_pointer_reference __left(node_pointer __p) {
-    return (*__p).__left_;
-  }
-
-  static node_pointer_reference __right(node_pointer __p) {
-    return (*__p).__right_;
-  }
-
  public:
-
-  // iterator class
-  // TODO: Check why friend modifier is needed here
-
-  class __tree_iterator;
-  friend class __tree_iterator;
-  class __tree_iterator : public std::iterator<std::bidirectional_iterator_tag,
-                                        value_type,
-                                        difference_type,
-                                        pointer,
-                                        reference> {
-   public:
-    typedef std::iterator<std::bidirectional_iterator_tag, value_type,
-                          difference_type, pointer, reference>             iterator_base;
-    typedef typename ft::iterator_traits<iterator_base>::iterator_category iterator_category;
-    typedef typename ft::iterator_traits<iterator_base>::value_type        value_type;
-    typedef typename ft::iterator_traits<iterator_base>::difference_type   difference_type;
-    typedef typename ft::iterator_traits<iterator_base>::pointer           pointer;
-    typedef typename ft::iterator_traits<iterator_base>::reference         reference;
-
-    // Member variable
-    // TODO: Check if this should be private or protected
-
-    node_pointer __node_ptr_;
-
-    __tree_iterator() : __node_ptr_(NULL) {}
-
-    __tree_iterator(node_pointer __p) : __node_ptr_(__p) {}
-
-    reference operator*() const { return __node_ptr_->__value_; }
-
-    pointer operator->() const { return &**this; }
-
-    __tree_iterator& operator++() {
-      __increment();
-      return *this;
-    }
-
-    __tree_iterator operator++(int) {
-      __tree_iterator __tmp = *this;
-      ++*this;
-      return __tmp;
-    }
-
-    __tree_iterator& operator--() {
-      __decrement();
-      return *this;
-    }
-
-    __tree_iterator operator--(int) {
-      __tree_iterator __tmp = *this;
-      --*this;
-      return __tmp;
-    }
-
-    bool operator==(const __tree_iterator& __x) const {
-      return __node_ptr_ == __x.__node_ptr_;
-    }
-
-    bool operator!=(const __tree_iterator& __x) const {
-      return !(*this == __x);
-    }
-
-   private:
-
-    // TODO: Fully understand logics of increment and decrement here
-    // TODO: Check if those helper functions should be public
-
-    void __decrement() {
-      if (__isnil(__node_ptr_)) {
-        __node_ptr_ = __right(__node_ptr_);
-      } else if (!__isnil(__left(__node_ptr_))) {
-        __node_ptr_ = __max(__left(__node_ptr_));
-      } else {
-        node_pointer __p = __parent(__node_ptr_);
-        while (!__isnil(__p) && __node_ptr_ == __left(__p)) {
-          __node_ptr_ = __p;
-          __p = __parent(__node_ptr_);
-        }
-        if (!__isnil(__node_ptr_)) {
-          __node_ptr_ = __p;
-        }
-      }
-    }
-
-    void __increment() {
-      if (__isnil(__node_ptr_)) {
-        ;
-      } else if (!__isnil(__right(__node_ptr_))) {
-        __node_ptr_ = __min(__right(__node_ptr_));
-      } else {
-        node_pointer __p = __parent(__node_ptr_);
-        while (!__isnil(__p) && __node_ptr_ == __right(__p)) {
-          __node_ptr_ = __p;
-          __p = __parent(__node_ptr_);
-        }
-        __node_ptr_ = __p;
-      }
-    }
-
-    friend class __tree_const_iterator;
-
-  }; // __tree_iterator class
-
-
-  // __tree_const_iterator class
-
-  class __tree_const_iterator;
-  friend class __tree_const_iterator;
-  class __tree_const_iterator : public std::iterator<std::bidirectional_iterator_tag,
-                                        value_type,
-                                        difference_type,
-                                        const_pointer,
-                                        const_reference> {
-
-   public:
-    typedef std::iterator<std::bidirectional_iterator_tag, value_type,
-                          difference_type, const_pointer, const_reference> iterator_base;
-    typedef typename ft::iterator_traits<iterator_base>::iterator_category iterator_category;
-    typedef typename ft::iterator_traits<iterator_base>::value_type        value_type;
-    typedef typename ft::iterator_traits<iterator_base>::difference_type   difference_type;
-    typedef typename ft::iterator_traits<iterator_base>::pointer           pointer;
-    typedef typename ft::iterator_traits<iterator_base>::reference         reference;
-
-    // Member variable
-    // TODO: Check if this should be private or protected
-
-    node_pointer __node_ptr_;
-
-    __tree_const_iterator() : __node_ptr_(NULL) {}
-
-    __tree_const_iterator(node_pointer __p) : __node_ptr_(__p) {}
-
-    __tree_const_iterator(const typename __tree<_TreeTraits>::__tree_iterator& __x)
-      : __node_ptr_(__x.__node_ptr_) {}
-
-    reference operator*() const { return __node_ptr_->__value_; }
-
-    pointer operator->() const { return &**this; }
-
-    __tree_const_iterator& operator++() {
-      __increment();
-      return *this;
-    }
-
-    __tree_const_iterator operator++(int) {
-      __tree_const_iterator __tmp = *this;
-      ++*this;
-      return __tmp;
-    }
-
-    __tree_const_iterator& operator--() {
-      __decrement();
-      return *this;
-    }
-
-    __tree_const_iterator operator--(int) {
-      __tree_const_iterator __tmp = *this;
-      --*this;
-      return __tmp;
-    }
-
-    bool operator==(const __tree_const_iterator& __x) const {
-      return __node_ptr_ == __x.__node_ptr_;
-    }
-
-    bool operator!=(const __tree_const_iterator& __x) const {
-      return !(*this == __x);
-    }
-
-   private:
-
-    void __decrement() {
-      if (__isnil(__node_ptr_)) {
-        __node_ptr_ = __right(__node_ptr_);
-      } else if (!__isnil(__left(__node_ptr_))) {
-        __node_ptr_ = __max(__left(__node_ptr_));
-      } else {
-        node_pointer __p = __parent(__node_ptr_);
-        while (!__isnil(__p) && __node_ptr_ == __left(__p)) {
-          __node_ptr_ = __p;
-          __p = __parent(__node_ptr_);
-        }
-        __node_ptr_ = __p;
-      }
-    }
-
-    void __increment() {
-      if (__isnil(__node_ptr_)) {
-        ;
-      } else if (!__isnil(__right(__node_ptr_))) {
-        __node_ptr_ = __min(__right(__node_ptr_));
-      } else {
-        node_pointer __p = __parent(__node_ptr_);
-        while (!__isnil(__p) && __node_ptr_ == __right(__p)) {
-          __node_ptr_ = __p;
-          __p = __parent(__node_ptr_);
-        }
-        __node_ptr_ = __p;
-      }
-    }
-
-  }; // __tree_const_iterator
-
-  typedef __tree_iterator                                        iterator;
-  typedef __tree_const_iterator                                  const_iterator;
-  typedef ft::reverse_iterator<iterator>                         reverse_iterator;
-  typedef ft::reverse_iterator<const_iterator>                   const_reverse_iterator;
-  typedef ft::pair<__tree_iterator, bool>                        pair_ib;
-  typedef ft::pair<__tree_iterator, __tree_iterator>             pair_ii;
-  typedef ft::pair<__tree_const_iterator, __tree_const_iterator> pair_cc;
 
   __tree(const key_compare& __comp, const allocator_type& __a)
     : __comp_(__comp), __alloc_value_(__a), __alloc_node_(__a), __alloc_node_pointer_(__a) {
@@ -404,10 +368,10 @@ class __tree {
     node_pointer __x = __root();
     node_pointer __y = __head_;
     bool __add_left = true;
-    while (!__isnil(__x)) {
+    while (!(__x->__isnil_)) {
       __y = __x;
       __add_left = __comp_(key_getter()(__v), __key(__x));
-      __x = __add_left ? __left(__x) : __right(__x);
+      __x = __add_left ? __x->__left_ : __x->__right_;
     }
     iterator __it = iterator(__y);
     if (!__add_left) {
@@ -417,7 +381,7 @@ class __tree {
     } else {
       --__it;
     }
-    if (__comp_(__key(__it.__node_ptr_), key_getter()(__v))) {
+    if (__comp_(__key(__it.base()), key_getter()(__v))) {
       return pair_ib(__insert(__add_left, __y, __v), true);
     } else {
       return pair_ib(__it, false);
@@ -431,8 +395,8 @@ class __tree {
     if (size() == 0) {
       return __insert(true, __head_, __v);
     } else if (__it == begin()) {
-      if (__comp_(key_getter()(__v), __key(__it.__node_ptr_))) {
-        return __insert(true, __it.__node_ptr_, __v);
+      if (__comp_(key_getter()(__v), __key(__it.base()))) {
+        return __insert(true, __it.base(), __v);
       }
     } else if (__it == end()) {
       if (__comp_(__key(__rmost()), key_getter()(__v))) {
@@ -441,12 +405,12 @@ class __tree {
     } else {
       iterator __it_prev = __it;
       --__it_prev;
-      if (__comp_(__key(__it_prev.__node_ptr_), key_getter()(__v))
-          && __comp_(key_getter()(__v), __key(__it.__node_ptr_))) {
-        if (__isnil(__right(__it_prev.__node_ptr_))) {
-          return __insert(false, __it_prev.__node_ptr_, __v);
+      if (__comp_(__key(__it_prev.base()), key_getter()(__v))
+          && __comp_(key_getter()(__v), __key(__it.base()))) {
+        if (__it_prev.base()->__right_->__isnil_) {
+          return __insert(false, __it_prev.base(), __v);
         } else {
-          return __insert(true, __it.__node_ptr_, __v);
+          return __insert(true, __it.base(), __v);
         }
       }
     }
@@ -461,128 +425,128 @@ class __tree {
   }
 
   void erase(iterator __p) {
-    if (__isnil(__p.__node_ptr_)) {
+    if (__p.base()->__isnil_) {
       throw std::out_of_range("map/set<T> iterator");
     }
-    node_pointer __target = __p.__node_ptr_;
+    node_pointer __target = __p.base();
     node_pointer __target_copy = __target;
     node_pointer __replace;
     node_pointer __target_parent;
-    if (__isnil(__left(__target))) {
-      __replace = __right(__target);
-    } else if (__isnil(__right(__target))) {
-      __replace = __left(__target);
+    if (__target->__left_->__isnil_) {
+      __replace = __target->__right_;
+    } else if (__target->__right_->__isnil_) {
+      __replace = __target->__left_;
     } else {
-      __target = __min(__right(__target));
-      __replace = __right(__target);
+      __target = __target->__right_->min_node();
+      __replace = __target->__right_;
     }
     if (__target == __target_copy) { // __p has no children or only one child
-      __target_parent = __parent(__target_copy);
-      if (!__isnil(__replace)) {
-        __parent(__replace) = __target_parent;
+      __target_parent = __target_copy->__parent_;
+      if (!(__replace->__isnil_)) {
+        __replace->__parent_ = __target_parent;
       }
       if (__root() == __target_copy) {
         __root() = __replace;
-      } else if (__left(__target_parent) == __target_copy) {
-        __left(__target_parent) = __replace;
+      } else if (__target_parent->__left_ == __target_copy) {
+        __target_parent->__left_ = __replace;
       } else {
-        __right(__target_parent) = __replace;
+        __target_parent->__right_ = __replace;
       }
       if (__lmost() != __target_copy) {
         ;
-      } else if (__isnil(__replace)) {
+      } else if (__replace->__isnil_) {
         __lmost() = __target_parent;
       } else {
-        __lmost() = __min(__replace);
+        __lmost() = __replace->min_node();
       }
       if (__rmost() != __target_copy) {
         ;
-      } else if (__isnil(__replace)) {
+      } else if (__replace->__isnil_) {
         __rmost() = __target_parent;
       } else {
-        __rmost() = __max(__replace);
+        __rmost() = __replace->max_node();
       }
     } else { // __p has both children
-      __parent(__left(__target_copy)) = __target;
-      __left(__target) = __left(__target_copy);
-      if (__target == __right(__target_copy)) {
+      __target_copy->__left_->__parent_ = __target;
+      __target->__left_ = __target_copy->__left_;
+      if (__target == __target_copy->__right_) {
         __target_parent = __target;
       } else {
-        __target_parent = __parent(__target);
-        if (!__isnil(__replace)) {
-          __parent(__replace) = __target_parent;
+        __target_parent = __target->__parent_;
+        if (!(__replace->__isnil_)) {
+          __replace->__parent_ = __target_parent;
         }
-        __left(__target_parent) = __replace;
-        __right(__target) = __right(__target_copy);
-        __parent(__right(__target_copy)) = __target;
+        __target_parent->__left_ = __replace;
+        __target->__right_ = __target_copy->__right_;
+        __target_copy->__right_->__parent_ = __target;
       }
       if (__root() == __target_copy) {
         __root() = __target;
-      } else if (__left(__parent(__target_copy)) == __target_copy) {
-        __left(__parent(__target_copy)) = __target;
+      } else if (__target_copy->__parent_->__left_ == __target_copy) {
+        __target_copy->__parent_->__left_ = __target;
       } else {
-        __right(__parent(__target_copy)) = __target;
+        __target_copy->__parent_->__right_ = __target;
       }
-      __parent(__target) = __parent(__target_copy);
-      std::swap(__color(__target), __color(__target_copy));
+      __target->__parent_ = __target_copy->__parent_;
+      std::swap(__target->__color_, __target_copy->__color_);
     }
-    if (__color(__target_copy) == Black) {
-      for (; __replace != __root() && __color(__replace) == Black; __target_parent = __parent(__replace)) {
-        if (__replace == __left(__target_parent)) {
-          node_pointer __replace_sib = __right(__target_parent);
-          if (__color(__replace_sib) == Red) {
-            __color(__replace_sib) = Black;
-            __color(__target_parent) = Red;
+    if (__target_copy->__color_ == Black) {
+      for (; __replace != __root() && __replace->__color_ == Black; __target_parent = __replace->__parent_) {
+        if (__replace == __target_parent->__left_) {
+          node_pointer __replace_sib = __target_parent->__right_;
+          if (__replace_sib->__color_ == Red) {
+            __replace_sib->__color_ = Black;
+            __target_parent->__color_ = Red;
             __lrotate(__target_parent);
-            __replace_sib = __right(__target_parent);
+            __replace_sib = __target_parent->__right_;
           }
-          if (__isnil(__replace_sib)) {
+          if (__replace_sib->__isnil_) {
             __replace = __target_parent; // should not happen
-          } else if (__color(__left(__replace_sib)) == Black && __color(__right(__replace_sib)) == Black) {
-            __color(__replace_sib) = Red;
+          } else if (__replace_sib->__left_->__color_ == Black && __replace_sib->__right_->__color_ == Black) {
+            __replace_sib->__color_ = Red;
             __replace = __target_parent;
           } else {
-            if (__color(__right(__replace_sib)) == Black) {
-              __color(__left(__replace_sib)) = Black;
-              __color(__replace_sib) = Red;
+            if (__replace_sib->__right_->__color_ == Black) {
+              __replace_sib->__left_->__color_ = Black;
+              __replace_sib->__color_ = Red;
               __rrotate(__replace_sib);
-              __replace_sib = __right(__target_parent);
+              __replace_sib = __target_parent->__right_;
             }
-            __color(__replace_sib) = __color(__target_parent);
-            __color(__target_parent) = Black;
-            __color(__right(__replace_sib)) = Black;
+            __replace_sib->__color_ = __target_parent->__color_;
+            __target_parent->__color_ = Black;
+            __replace_sib->__right_->__color_ = Black;
             __lrotate(__target_parent);
             break;
           }
         } else {
-          node_pointer __replace_sib = __left(__target_parent);
-          if (__color(__replace_sib) == Red) {
-            __color(__replace_sib) = Black;
-            __color(__target_parent) = Red;
+          node_pointer __replace_sib = __target_parent->__left_;
+          if (__replace_sib->__color_ == Red) {
+            __replace_sib->__color_ = Black;
+            __target_parent->__color_ = Red;
             __rrotate(__target_parent);
-            __replace_sib = __left(__target_parent);
+            __replace_sib = __target_parent->__left_;
           }
-          if (__isnil(__replace_sib)) {
+          if (__replace_sib->__isnil_) {
             __replace = __target_parent; // should not happen
-          } else if (__color(__right(__replace_sib)) == Black && __color(__left(__replace_sib)) == Black) {
-            __color(__replace_sib) = Red;
+          } else if (__replace_sib->__right_->__color_ == Black && __replace_sib->__left_->__color_ == Black) {
+            __replace_sib->__color_ = Red;
             __replace = __target_parent;
           } else {
-            if (__color(__left(__replace_sib)) == Black) {
-              __color(__right(__replace_sib)) = Black;
-              __color(__replace_sib) = Red;
+            if (__replace_sib->__left_->__color_ == Black) {
+              __replace_sib->__right_->__color_ = Black;
+              __replace_sib->__color_ = Red;
               __lrotate(__replace_sib);
-              __replace_sib = __left(__target_parent);
+              __replace_sib = __target_parent->__left_;
             }
-            __color(__replace_sib) = __color(__target_parent);
-            __color(__target_parent) = Black;
-            __color(__left(__replace_sib)) = Black;
+            __replace_sib->__color_ = __target_parent->__color_;
+            __target_parent->__color_ = Black;
+            __replace_sib->__left_->__color_ = Black;
             __rrotate(__target_parent);
             break;
           }
         }
       }
-      __color(__replace) = Black;
+      __replace->__color_ = Black;
     }
     __destval(&(__target_copy->__value_));
     __freenode(__target_copy);
@@ -622,12 +586,12 @@ class __tree {
 
   iterator find(const key_type& __k) {
     iterator __p = lower_bound(__k);
-    return (__p == end() || __comp_(__k, __key(__p.__node_ptr_))) ? end() : __p;
+    return (__p == end() || __comp_(__k, __key(__p.base()))) ? end() : __p;
   }
 
   const_iterator find(const key_type& __k) const {
     const_iterator __p = lower_bound(__k);
-    return (__p == end() || __comp_(__k, __key(__p.__node_ptr_))) ? end() : __p;
+    return (__p == end() || __comp_(__k, __key(__p.base()))) ? end() : __p;
   }
 
   size_type count(const key_type& __k) const {
@@ -677,11 +641,11 @@ class __tree {
 
   node_pointer __buynode(node_pointer __parent_ptr, char __c) {
     node_pointer __s = __alloc_node_.allocate(1);
-    __alloc_node_pointer_.construct(&__left(__s));
-    __alloc_node_pointer_.construct(&__right(__s));
-    __alloc_node_pointer_.construct(&__parent(__s), __parent_ptr);
-    __color(__s) = __c;
-    __isnil(__s) = false;
+    __alloc_node_pointer_.construct(&(__s->__left_));
+    __alloc_node_pointer_.construct(&(__s->__right_));
+    __alloc_node_pointer_.construct(&(__s->__parent_), __parent_ptr);
+    __s->__color_ = __c;
+    __s->__isnil_ = false;
     return __s;
   }
 
@@ -692,9 +656,9 @@ class __tree {
   void __destval(pointer __p) { __alloc_value_.destroy(__p); }
 
   void __freenode(node_pointer __s) {
-    __alloc_node_pointer_.destroy(&__parent(__s));
-    __alloc_node_pointer_.destroy(&__right(__s));
-    __alloc_node_pointer_.destroy(&__left(__s));
+    __alloc_node_pointer_.destroy(&(__s->__parent_));
+    __alloc_node_pointer_.destroy(&(__s->__right_));
+    __alloc_node_pointer_.destroy(&(__s->__left_));
     __alloc_node_.deallocate(__s, 1);
   }
 
@@ -703,52 +667,36 @@ class __tree {
 
   void __init() {
     __head_ = __buynode(NULL, Black);
-    __isnil(__head_) = true;
+    __head_->__isnil_ = true;
     __root() = __head_;
     __lmost() = __head_;
     __rmost() = __head_;
     __size_ = 0;
   }
 
-  node_pointer& __lmost() { return __left(__head_); }
+  node_pointer& __lmost() { return __head_->__left_; }
 
-  node_pointer& __lmost() const { return __left(__head_); }
+  node_pointer& __lmost() const { return __head_->__left_; }
 
-  node_pointer& __rmost() { return __right(__head_); }
+  node_pointer& __rmost() { return __head_->__right_; }
 
-  node_pointer& __rmost() const { return __right(__head_); }
+  node_pointer& __rmost() const { return __head_->__right_; }
 
-  node_pointer& __root() { return __parent(__head_); }
+  node_pointer& __root() { return __head_->__parent_; }
 
-  node_pointer& __root() const { return __parent(__head_); }
-
-  // TODO: Why these functions need to be static?
-
-  static node_pointer __max(node_pointer __p) {
-    while (!__isnil(__right(__p))) {
-      __p = __right(__p);
-    }
-    return __p;
-  }
-
-  static node_pointer __min(node_pointer __p) {
-    while (!__isnil(__left(__p))) {
-      __p = __left(__p);
-    }
-    return __p;
-  }
+  node_pointer& __root() const { return __head_->__parent_; }
 
   // TODO: Fully understand logics for helper functions below from here
 
   node_pointer __lbound(const key_type& __k) const {
     node_pointer __x = __root();
     node_pointer __y = __head_;
-    while (!__isnil(__x)) {
+    while (!(__x->__isnil_)) {
       if (__comp_(__key(__x), __k)) {
-        __x = __right(__x);
+        __x = __x->__right_;
       } else {
         __y = __x;
-        __x = __left(__x);
+        __x = __x->__left_;
       }
     }
     return __y;
@@ -757,51 +705,51 @@ class __tree {
   node_pointer __ubound(const key_type& __k) const {
     node_pointer __x = __root();
     node_pointer __y = __head_;
-    while (!__isnil(__x)) {
+    while (!(__x->__isnil_)) {
       if (__comp_(__k, __key(__x))) {
         __y = __x;
-        __x = __left(__x);
+        __x = __x->__left_;
       } else {
-        __x = __right(__x);
+        __x = __x->__right_;
       }
     }
     return __y;
   }
 
   void __lrotate(node_pointer __x) {
-    node_pointer __y = __right(__x);
-    __right(__x) = __left(__y);
-    if (!__isnil(__left(__y))) {
-      __parent(__left(__y)) = __x;
+    node_pointer __y = __x->__right_;
+    __x->__right_ = __y->__left_;
+    if (!(__y->__left_->__isnil_)) {
+      __y->__left_->__parent_ = __x;
     }
-    __parent(__y) = __parent(__x);
+    __y->__parent_ = __x->__parent_;
     if (__x == __root()) {
       __root() = __y;
-    } else if (__x == __left(__parent(__x))) {
-      __left(__parent(__x)) = __y;
+    } else if (__x == __x->__parent_->__left_) {
+      __x->__parent_->__left_ = __y;
     } else {
-      __right(__parent(__x)) = __y;
+      __x->__parent_->__right_ = __y;
     }
-    __left(__y) = __x;
-    __parent(__x) = __y;
+    __y->__left_ = __x;
+    __x->__parent_ = __y;
   }
 
   void __rrotate(node_pointer __x) {
-    node_pointer __y = __left(__x);
-    __left(__x) = __right(__y);
-    if (!__isnil(__right(__y))) {
-      __parent(__right(__y)) = __x;
+    node_pointer __y = __x->__left_;
+    __x->__left_ = __y->__right_;
+    if (!(__y->__right_->__isnil_)) {
+      __y->__right_->__parent_ = __x;
     }
-    __parent(__y) = __parent(__x);
+    __y->__parent_ = __x->__parent_;
     if (__x == __root()) {
       __root() = __y;
-    } else if (__x == __right(__parent(__x))) {
-      __right(__parent(__x)) = __y;
+    } else if (__x == __x->__parent_->__right_) {
+      __x->__parent_->__right_ = __y;
     } else {
-      __left(__parent(__x)) = __y;
+      __x->__parent_->__left_ = __y;
     }
-    __right(__y) = __x;
-    __parent(__x) = __y;
+    __y->__right_ = __x;
+    __x->__parent_ = __y;
   }
 
   // The parent node of the root node should be __head_ by definition
@@ -811,9 +759,9 @@ class __tree {
     __root() = __copy(__x.__root(), __head_);
     __size_ = __x.size();
     __comp_ = __x.__comp_;
-    if (!__isnil(__root())) {
-      __lmost() = __min(__root());
-      __rmost() = __max(__root());
+    if (!(__root()->__isnil_)) {
+      __lmost() = __root()->min_node();
+      __rmost() = __root()->max_node();
     } else {
       __lmost() = __head_;
       __rmost() = __head_;
@@ -822,8 +770,8 @@ class __tree {
 
   node_pointer __copy(node_pointer __x, node_pointer __parent_ptr) {
     node_pointer __r = __head_;
-    if (!__isnil(__x)) {
-      node_pointer __y = __buynode(__parent_ptr, __color(__x));
+    if (!(__x->__isnil_)) {
+      node_pointer __y = __buynode(__parent_ptr, __x->__color_);
       try {
         __consval(&(__y->__value_), __x->__value_);
       } catch (...) {
@@ -831,14 +779,14 @@ class __tree {
         __erase(__r);
         throw;
       }
-      __left(__y) = __head_;
-      __right(__y) = __head_;
-      if (__isnil(__r)) {
+      __y->__left_ = __head_;
+      __y->__right_ = __head_;
+      if (__r->__isnil_) {
         __r = __y;
       }
       try {
-        __left(__y) = __copy(__left(__x), __y);
-        __right(__y) = __copy(__right(__x), __y);
+        __y->__left_ = __copy(__x->__left_, __y);
+        __y->__right_ = __copy(__x->__right_, __y);
       } catch (...) {
         __erase(__r);
         throw;
@@ -848,9 +796,9 @@ class __tree {
   }
 
   void __erase(node_pointer __x) {
-    for (node_pointer __y = __x; !__isnil(__y); __x = __y) {
-      __erase(__right(__y));
-      __y = __left(__y);
+    for (node_pointer __y = __x; !(__y->__isnil_); __x = __y) {
+      __erase(__y->__right_);
+      __y = __y->__left_;
       __destval(&(__x->__value_));
       __freenode(__x);
     }
@@ -861,8 +809,8 @@ class __tree {
       throw std::length_error("map/set<T> too long");
     }
     node_pointer __z = __buynode(__y, Red);
-    __left(__z) = __head_;
-    __right(__z) = __head_;
+    __z->__left_ = __head_;
+    __z->__right_ = __head_;
     try {
       __consval(&(__z->__value_), __v);
     } catch (...) {
@@ -875,52 +823,52 @@ class __tree {
       __lmost() = __z;
       __rmost() = __z;
     } else if (__addleft) {
-      __left(__y) = __z;
+      __y->__left_ = __z;
       if (__y == __lmost()) {
         __lmost() = __z;
       }
     } else {
-      __right(__y) = __z;
+      __y->__right_ = __z;
       if (__y == __rmost()) {
         __rmost() = __z;
       }
     }
-    for (node_pointer __x = __z; __color(__parent(__x)) == Red; ) {
-      if (__parent(__x) == __left(__parent(__parent(__x)))) {
-        __y = __right(__parent(__parent(__x)));
-        if (__color(__y) == Red) {
-          __color(__parent(__x)) = Black;
-          __color(__y) = Black;
-          __color(__parent(__parent(__x))) = Red;
-          __x = __parent(__parent(__x));
+    for (node_pointer __x = __z; __x->__parent_->__color_ == Red; ) {
+      if (__x->__parent_ == __x->__parent_->__parent_->__left_) {
+        __y = __x->__parent_->__parent_->__right_;
+        if (__y->__color_ == Red) {
+          __x->__parent_->__color_ = Black;
+          __y->__color_ = Black;
+          __x->__parent_->__parent_->__color_ = Red;
+          __x = __x->__parent_->__parent_;
         } else {
-          if (__x == __right(__parent(__x))) {
-            __x = __parent(__x);
+          if (__x == __x->__parent_->__right_) {
+            __x = __x->__parent_;
             __lrotate(__x);
           }
-          __color(__parent(__x)) = Black;
-          __color(__parent(__parent(__x))) = Red;
-          __rrotate(__parent(__parent(__x)));
+          __x->__parent_->__color_ = Black;
+          __x->__parent_->__parent_->__color_ = Red;
+          __rrotate(__x->__parent_->__parent_);
         }
       } else {
-        __y = __left(__parent(__parent(__x)));
-        if (__color(__y) == Red) {
-          __color(__parent(__x)) = Black;
-          __color(__y) = Black;
-          __color(__parent(__parent(__x))) = Red;
-          __x = __parent(__parent(__x));
+        __y = __x->__parent_->__parent_->__left_;
+        if (__y->__color_ == Red) {
+          __x->__parent_->__color_ = Black;
+          __y->__color_ = Black;
+          __x->__parent_->__parent_->__color_ = Red;
+          __x = __x->__parent_->__parent_;
         } else {
-          if (__x == __left(__parent(__x))) {
-            __x = __parent(__x);
+          if (__x == __x->__parent_->__left_) {
+            __x = __x->__parent_;
             __rrotate(__x);
           }
-          __color(__parent(__x)) = Black;
-          __color(__parent(__parent(__x))) = Red;
-          __lrotate(__parent(__parent(__x)));
+          __x->__parent_->__color_ = Black;
+          __x->__parent_->__parent_->__color_ = Red;
+          __lrotate(__x->__parent_->__parent_);
         }
       }
     }
-    __color(__root()) = Black;
+   __root()->__color_ = Black;
     return iterator(__z);
   }
 
