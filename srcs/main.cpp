@@ -11,6 +11,7 @@
 #include <map>
 #include <set>
 #include "map.hpp"
+#include "set.hpp"
 
 // std::vector<int> vec;
 // std::stack<int> stack;
@@ -82,19 +83,42 @@ int main() {
     std::cout << it->first << " => " << it->second << '\n';
   */
 
-  ft::vector<std::string> Z1;
-  ft::vector<std::string> Z2;
+  // ft::vector<std::string> Z1;
+  // ft::vector<std::string> Z2;
 
-  Z1.insert(Z1.begin(), 10, "test");
-  Z2.insert(Z2.begin(), Z1.begin(), Z1.end());
+  // Z1.insert(Z1.begin(), 10, "test");
+  // Z2.insert(Z2.begin(), Z1.begin(), Z1.end());
 
-  for (ft::vector<std::string>::iterator it = Z1.begin(), end = Z1.end(); it != end; ++it) {
-    std::cout << *it << std::endl;
-  }
+  // for (ft::vector<std::string>::iterator it = Z1.begin(), end = Z1.end(); it != end; ++it) {
+  //   std::cout << *it << std::endl;
+  // }
 
-  for (ft::vector<std::string>::iterator it = Z2.begin(), end = Z2.end(); it != end; ++it) {
-    std::cout << *it << std::endl;
-  }
+  // for (ft::vector<std::string>::iterator it = Z2.begin(), end = Z2.end(); it != end; ++it) {
+  //   std::cout << *it << std::endl;
+  // }
+
+  ft::set<int> myset;
+  ft::set<int>::iterator it;
+  ft::pair<ft::set<int>::iterator,bool> ret;
+
+  // set some initial values:
+  for (int i=1; i<=5; ++i) myset.insert(i*10);    // set: 10 20 30 40 50
+
+  ret = myset.insert(20);               // no new element inserted
+
+  if (ret.second==false) it=ret.first;  // "it" now points to element 20
+
+  myset.insert (it,25);                 // max efficiency inserting
+  myset.insert (it,24);                 // max efficiency inserting
+  myset.insert (it,26);                 // no max efficiency inserting
+
+  int myints[]= {5,10,15};              // 10 already in set, not inserted
+  myset.insert (myints,myints+3);
+
+  std::cout << "myset contains:";
+  for (it=myset.begin(); it!=myset.end(); ++it)
+    std::cout << ' ' << *it;
+  std::cout << '\n';
 
   return 0;
 }
