@@ -532,8 +532,6 @@ class __tree {
 
  protected:
 
-  // TODO: Do we need initialization values for construction of left and right?
-
   node_pointer __consnode(node_pointer __parent_ptr, char __c) {
     node_pointer __s = __alloc_node_.allocate(1);
     __alloc_node_pointer_.construct(&(__s->__left_));
