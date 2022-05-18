@@ -30,6 +30,8 @@ TEST		:= -D TEST=1
 
 LEAKS   := -D LEAKS=1
 
+STL			:= -D STL=1
+
 all:		$(NAME)
 
 $(NAME):	$(OBJS)
@@ -42,6 +44,7 @@ $(OBJSDIR)%.o: %.cpp
 clean:
 	$(RM) $(OBJSDIR)
 	$(RM) *.dSYM
+	$(RM) *.txt
 
 fclean:		clean
 	$(RM) $(NAME)
@@ -54,8 +57,14 @@ debug:		re
 shadow:		CXXFLAGS += $(SHADOW)
 shadow:		re
 
-test:			CXXFLAGS += $(TEST)
-test:			re
+test:
+	make
+	./$(NAME) > ft_out.txt 2> ft_err.txt
+	make -B CXXFLAGS="$(CXXFLAGS) $(STL)"
+	./$(NAME) > stl_out.txt 2> stl_err.txt
+	diff ft_out.txt stl_out.txt
+	cat ft_err.txt
+	cat stl_err.txt
 
 leaks:		CXXFLAGS += $(TEST) $(LEAKS)
 leaks:		re
