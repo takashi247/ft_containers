@@ -322,7 +322,7 @@ class __tree {
 
   virtual ~__tree() {
     erase(begin(), end());
-    __freenode(__head_);
+    __destnode(__head_);
     __head_ = NULL;
     __size_ = 0;
   }
@@ -534,7 +534,7 @@ class __tree {
 
   // TODO: Do we need initialization values for construction of left and right?
 
-  node_pointer __buynode(node_pointer __parent_ptr, char __c) {
+  node_pointer __consnode(node_pointer __parent_ptr, char __c) {
     node_pointer __s = __alloc_node_.allocate(1);
     __alloc_node_pointer_.construct(&(__s->__left_));
     __alloc_node_pointer_.construct(&(__s->__right_));
@@ -550,7 +550,7 @@ class __tree {
 
   void __destval(pointer __p) { __alloc_value_.destroy(__p); }
 
-  void __freenode(node_pointer __s) {
+  void __destnode(node_pointer __s) {
     __alloc_node_pointer_.destroy(&(__s->__parent_));
     __alloc_node_pointer_.destroy(&(__s->__right_));
     __alloc_node_pointer_.destroy(&(__s->__left_));
@@ -561,7 +561,7 @@ class __tree {
   // At the initialization, root, lmost, rmost should be pointed at __head_
 
   void __init() {
-    __head_ = __buynode(NULL, kBlack);
+    __head_ = __consnode(NULL, kBlack);
     __head_->__isnil_ = true;
     __root() = __head_;
     __lmost() = __head_;
@@ -707,11 +707,11 @@ class __tree {
   node_pointer __copy(node_pointer __x, node_pointer __parent_ptr) {
     node_pointer __r = __head_;
     if (!(__x->__isnil_)) {
-      node_pointer __y = __buynode(__parent_ptr, __x->__color_);
+      node_pointer __y = __consnode(__parent_ptr, __x->__color_);
       try {
         __consval(&(__y->__value_), __x->__value_);
       } catch (...) {
-        __freenode(__y);
+        __destnode(__y);
         __erase(__r);
         throw;
       }
@@ -736,7 +736,7 @@ class __tree {
       __erase(__y->__right_);
       __y = __y->__left_;
       __destval(&(__x->__value_));
-      __freenode(__x);
+      __destnode(__x);
     }
   }
 
@@ -744,13 +744,13 @@ class __tree {
     if (max_size() - 1 <= __size_) {
       throw std::length_error("map/set<T> too long");
     }
-    node_pointer __new = __buynode(__parent, kRed);
+    node_pointer __new = __consnode(__parent, kRed);
     __new->__left_ = __head_;
     __new->__right_ = __head_;
     try {
       __consval(&(__new->__value_), __v);
     } catch (...) {
-      __freenode(__new);
+      __destnode(__new);
       throw;
     }
     ++__size_;
@@ -1010,7 +1010,7 @@ class __tree {
 
   void __erase_node(node_pointer_reference __node_to_erase) {
     __destval(&(__node_to_erase->__value_));
-    __freenode(__node_to_erase);
+    __destnode(__node_to_erase);
     if (0 < __size_) {
       --__size_;
     }
