@@ -37,6 +37,9 @@
 # References
 ref/
 
+# Output files
+*.txt
+
 # Testers
 ft_containers-tester-42/
 old_log/
