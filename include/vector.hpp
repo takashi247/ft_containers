@@ -373,7 +373,7 @@ class vector {
   }
 
   void clear() {
-    __destroy(__begin_, __end_);
+    erase(__begin_, __end_);
   }
 
   // Allocator
