@@ -24,13 +24,13 @@ RM			:= rm -rf
 
 DEBUG		:= -g -fsanitize=address
 
-SHADOW	:= -Wshadow
-
 TEST		:= -D TEST=1
 
 LEAKS   := -D LEAKS=1
 
 STL			:= -D STL=1
+
+TIME		:= -D TIME=1
 
 all:		$(NAME)
 
@@ -54,11 +54,11 @@ re:			fclean all
 debug:		CXXFLAGS += $(DEBUG)
 debug:		re
 
-shadow:		CXXFLAGS += $(SHADOW)
-shadow:		re
+stl:			CXXFLAGS += $(STL)
+stl:			re
 
 test:
-	make
+	make -B CXXFLAGS="$(CXXFLAGS)"
 	./$(NAME) > ft_out.txt 2> ft_err.txt
 	make -B CXXFLAGS="$(CXXFLAGS) $(STL)"
 	./$(NAME) > stl_out.txt 2> stl_err.txt
@@ -66,9 +66,19 @@ test:
 	cat ft_err.txt
 	cat stl_err.txt
 
-leaks:		CXXFLAGS += $(TEST) $(LEAKS)
-leaks:		re
+time:
+	make -B CXXFLAGS="$(CXXFLAGS) $(TIME)"
+	./$(NAME) > ft_out.txt 2> ft_err.txt
+	make -B CXXFLAGS="$(CXXFLAGS) $(TIME) $(STL)"
+	./$(NAME) > stl_out.txt 2> stl_err.txt
+#diff retuns 1 if there are any differences
+	diff ft_out.txt stl_out.txt
+	cat ft_err.txt
+	cat stl_err.txt
+
+leaks:		CXXFLAGS += $(LEAKS)
+leaks:		test
 
 -include $(DEPS)
 
-.PHONY:		all clean fclean re debug shadow test leaks
+.PHONY:		all clean fclean re debug time test leaks stl
