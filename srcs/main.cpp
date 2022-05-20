@@ -31,7 +31,7 @@ void print_container(_Container __c) {
 }
 
 void start_test(std::string __title) {
-  std::cout << "***" << __title << " starts***\n" << std::endl;
+  std::cout << "***" << __title << "***\n" << std::endl;
   time_start = clock();
 }
 
@@ -45,7 +45,8 @@ void end_test(std::string __title) {
 #endif
   std::cout << "Processed time for " << __title << ": " << ((float)(time_end - time_start) / CLOCKS_PER_SEC) * 1000 << std::endl;
 #endif
-  std::cout << "\n***" << __title << " ends***\n" << std::endl;
+  (void)__title;
+  std::cout << std::endl;
 }
 
 #if LEAKS
