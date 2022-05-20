@@ -1,7 +1,7 @@
 #ifndef __TREE_HPP
 #define __TREE_HPP
 
-#include <iterator> // for bidirectional iterator tag, distance
+#include <iterator> // for bidirectional iterator tag
 #include <limits> // for numeric_limits
 #include <algorithm> // for min, swap
 #include <memory> // for allocator max_size function
@@ -462,7 +462,7 @@ class __tree {
 
   size_type erase(const key_type& __x) {
     pair_ii __range = equal_range(__x);
-    size_type __n = std::distance(__range.first, __range.second);
+    size_type __n = ft::distance(__range.first, __range.second);
     erase(__range.first, __range.second);
     return __n;
   }
@@ -495,7 +495,7 @@ class __tree {
 
   size_type count(const key_type& __k) const {
     pair_cc __ans = equal_range(__k);
-    return std::distance(__ans.first, __ans.second);
+    return ft::distance(__ans.first, __ans.second);
   }
 
   iterator lower_bound(const key_type& __k) {

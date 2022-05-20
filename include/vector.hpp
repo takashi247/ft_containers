@@ -2,7 +2,7 @@
 #define VECTOR_HPP
 
 #include <memory> // for allaocator, allocator_traits
-#include <iterator> // for reverse_iterator, distance
+#include <iterator> // for reverse_iterator
 #include <algorithm> // for copy, min
 #include <stdexcept> // for out_of_range and length_error
 #include <limits> // for numeric_limits
@@ -454,7 +454,7 @@ class vector {
   template <class _Iterator>
   void __insert_range(iterator __position, _Iterator __first, _Iterator __last,
                       std::forward_iterator_tag) {
-    difference_type __n = std::distance(__first, __last);
+    difference_type __n = ft::distance(__first, __last);
     size_type __cap = capacity();
     size_type __ms = max_size();
     size_type __s = size();
