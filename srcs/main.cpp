@@ -449,6 +449,66 @@ int main() {
     ft::vector<int> foo (3,100);   // three ints with a value of 100
     ft::vector<int> bar (5,200);   // five ints with a value of 200
 
+    std::cout << "<Original vectors>\n\n";
+
+    std::cout << "foo contains:";
+    for (unsigned i=0; i<foo.size(); i++)
+      std::cout << ' ' << foo[i];
+    std::cout << '\n';
+
+    std::cout << "bar contains:";
+    for (unsigned i=0; i<bar.size(); i++)
+      std::cout << ' ' << bar[i];
+    std::cout << '\n';
+
+    foo.swap(bar);
+
+    std::cout << "\n<After swap>\n\n";
+
+    std::cout << "foo contains:";
+    for (unsigned i=0; i<foo.size(); i++)
+      std::cout << ' ' << foo[i];
+    std::cout << '\n';
+
+    std::cout << "bar contains:";
+    for (unsigned i=0; i<bar.size(); i++)
+      std::cout << ' ' << bar[i];
+    std::cout << '\n';
+
+    std::cout << "\n<Iterator case>\n\n";
+
+    ft::vector<int>::iterator it_foo = foo.begin();
+    ft::vector<int>::iterator it_bar = bar.begin();
+    ft::vector<int>::iterator end_foo = foo.end();
+    ft::vector<int>::iterator end_bar = bar.end();
+
+    bar.swap(foo);
+
+    std::cout << "foo contains:";
+    for (unsigned i=0; i<foo.size(); i++)
+      std::cout << ' ' << foo[i];
+    std::cout << '\n';
+
+    std::cout << "bar contains:";
+    for (unsigned i=0; i<bar.size(); i++)
+      std::cout << ' ' << bar[i];
+    std::cout << '\n';
+
+    std::cout << "it_foo refers to:";
+    for (; it_foo != end_foo; ++it_foo)
+      std::cout << ' ' << *it_foo;
+    std::cout << '\n';
+
+    std::cout << "it_bar refers to:";
+    for (; it_bar != end_bar; ++it_bar)
+      std::cout << ' ' << *it_bar;
+    std::cout << '\n';
+
+    std::cout << "\n<Reference case>\n\n";
+
+    ft::vector<int>& ref_foo = foo;
+    ft::vector<int>& ref_bar = bar;
+
     foo.swap(bar);
 
     std::cout << "foo contains:";
@@ -459,6 +519,43 @@ int main() {
     std::cout << "bar contains:";
     for (unsigned i=0; i<bar.size(); i++)
       std::cout << ' ' << bar[i];
+    std::cout << '\n';
+
+    std::cout << "ref_foo refers to:";
+    for (unsigned i=0; i<ref_foo.size(); i++)
+      std::cout << ' ' << ref_foo[i];
+    std::cout << '\n';
+
+    std::cout << "ref_bar refers to:";
+    for (unsigned i=0; i<ref_bar.size(); i++)
+      std::cout << ' ' << ref_bar[i];
+    std::cout << '\n';
+
+    std::cout << "\n<Pointer case>\n\n";
+
+    ft::vector<int>* ptr_foo = &foo;
+    ft::vector<int>* ptr_bar = &bar;
+
+    foo.swap(bar);
+
+    std::cout << "foo contains:";
+    for (unsigned i=0; i<foo.size(); i++)
+      std::cout << ' ' << foo[i];
+    std::cout << '\n';
+
+    std::cout << "bar contains:";
+    for (unsigned i=0; i<bar.size(); i++)
+      std::cout << ' ' << bar[i];
+    std::cout << '\n';
+
+    std::cout << "ptr_foo refers to:";
+    for (unsigned i=0; i<foo.size(); i++)
+      std::cout << ' ' << (*ptr_foo)[i];
+    std::cout << '\n';
+
+    std::cout << "ptr_bar refers to:";
+    for (unsigned i=0; i<bar.size(); i++)
+      std::cout << ' ' << (*ptr_bar)[i];
     std::cout << '\n';
 
     end_test(title);
