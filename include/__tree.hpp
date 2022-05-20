@@ -354,9 +354,9 @@ class __tree {
   size_type size() const { return __size_; }
 
   size_type max_size() const {
-    return std::min(
+    return std::min<size_type>(
            __alloc_node_.max_size(),
-           static_cast<size_type>(std::numeric_limits<difference_type>::max()));
+           std::numeric_limits<difference_type>::max());
   }
 
   bool empty() const { return size() == 0; }

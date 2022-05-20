@@ -174,8 +174,8 @@ class vector {
   }
 
   size_type max_size() const {
-    return std::min(__alloc_.max_size(),
-                    static_cast<size_type>(std::numeric_limits<difference_type>::max()));
+    return std::min<size_type>(__alloc_.max_size(),
+                               std::numeric_limits<difference_type>::max());
   }
 
   void resize(size_type __sz) {
