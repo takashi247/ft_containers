@@ -48,6 +48,13 @@ bool lexicographical_compare(_InputIterator1 __first1, _InputIterator1 __last1,
   return false;
 }
 
+template <class T>
+void swap(T& __a, T& __b) {
+  T __c = __a;
+  __a = __b;
+  __b = __c;
+}
+
 }
 
 #endif // ALGORITHM_HPP
