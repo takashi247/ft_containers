@@ -23,11 +23,12 @@
 
 clock_t time_start, time_end;
 
-template <class _Container>
-void print_container(_Container __c) {
-  for (typename _Container::iterator __it = __c.begin(), __end = __c.end(); __it != __end; ++__it) {
-    std::cout << *__it << std::endl;
+template <class _Iter>
+void print_container(_Iter __first, _Iter __last) {
+  for (; __first != __last; ++__first) {
+    std::cout << ' ' << *__first;
   }
+  std::cout << '\n';
 }
 
 void start_test(std::string __title) {
@@ -75,37 +76,17 @@ int main() {
     ft::vector<int> third (second.begin(),second.end());  // iterating through second
     ft::vector<int> fourth (third);                       // a copy of third
 
-    //TODO: Understand why print_container does not work
-
-    // print_container(first);
-    // print_container(second);
-    // print_container(third);
-    // print_container(fourth);
-
-    for (ft::vector<int>::iterator it = first.begin(); it != first.end(); ++it)
-      std::cout << ' ' << *it;
-    std::cout << '\n';
-
-    for (ft::vector<int>::iterator it = second.begin(); it != second.end(); ++it)
-      std::cout << ' ' << *it;
-    std::cout << '\n';
-
-    for (ft::vector<int>::iterator it = third.begin(); it != third.end(); ++it)
-      std::cout << ' ' << *it;
-    std::cout << '\n';
-
-    for (ft::vector<int>::iterator it = fourth.begin(); it != fourth.end(); ++it)
-      std::cout << ' ' << *it;
-    std::cout << '\n';
+    print_container(first.begin(), first.end());
+    print_container(second.begin(), second.end());
+    print_container(third.begin(), third.end());
+    print_container(fourth.begin(), fourth.end());
 
     // the iterator constructor can also be used to construct from arrays:
     int myints[] = {16,2,77,29};
     ft::vector<int> fifth (myints, myints + sizeof(myints) / sizeof(int) );
 
     std::cout << "The contents of fifth are:";
-    for (ft::vector<int>::iterator it = fifth.begin(); it != fifth.end(); ++it)
-      std::cout << ' ' << *it;
-    std::cout << '\n';
+    print_container(fifth.begin(), fifth.end());
     end_test(title);
   }
   {
@@ -128,9 +109,7 @@ int main() {
     for (int i=1; i<=5; i++) myvector.push_back(i);
 
     std::cout << "myvector contains:";
-    for (ft::vector<int>::iterator it = myvector.begin() ; it != myvector.end(); ++it)
-      std::cout << ' ' << *it;
-    std::cout << '\n';
+    print_container(myvector.begin(), myvector.end());
     end_test(title);
   }
   {
@@ -145,9 +124,7 @@ int main() {
       *rit = ++i;
 
     std::cout << "myvector contains:";
-    for (ft::vector<int>::iterator it = myvector.begin(); it != myvector.end(); ++it)
-      std::cout << ' ' << *it;
-    std::cout << '\n';
+    print_container(myvector.begin(), myvector.end());
     end_test(title);
   }
   {
@@ -646,6 +623,41 @@ int main() {
 
     end_test(title);
   }
+  {
+    std::string title = "iterator comparison test";
+    start_test(title);
+
+    ft::vector<int> vec;
+
+    for (int i = 0; i < 10; ++i) {
+      vec.push_back(i);
+    }
+    ft::vector<int>::iterator it = vec.begin();
+    ft::vector<int>::iterator end = vec.end();
+    ft::vector<int>::const_iterator c_end = end;
+    print_container(it, end);
+    for (; it < c_end; ++it) {
+      std::cout << ' ' << *it;
+    }
+    std::cout << '\n';
+
+    end_test(title);
+  }
+  {
+    std::string title = "input iterator test";
+    start_test(title);
+
+    const std::string s("123 456 789");
+
+    std::istringstream iss(s);
+    std::istream_iterator<int> isIt(iss);
+    std::istream_iterator<int> isItEnd;
+
+    ft::vector<int> v(isIt, isItEnd);
+    print_container(v.begin(), v.end());
+
+    end_test(title);
+  }
 
   std::cout << "=====Stack test=====\n" << std::endl;
 
@@ -766,8 +778,6 @@ int main() {
     std::string title = "operator< test";
     start_test(title);
 
-    using namespace std;
-
     ft::stack <int, std::list<int> > s1, s2, s3;
 
     s1.push( 2 );
@@ -782,36 +792,34 @@ int main() {
     s3.push( 8 );
 
     if ( s1 >= s2 )
-      cout << "The stack s1 is greater than or equal to "
-           << "the stack s2." << endl;
+      std::cout << "The stack s1 is greater than or equal to "
+                << "the stack s2." << std::endl;
     else
-      cout << "The stack s1 is less than "
-           << "the stack s2." << endl;
+      std::cout << "The stack s1 is less than "
+                << "the stack s2." << std::endl;
 
     if ( s1>= s3 )
-      cout << "The stack s1 is greater than or equal to "
-           << "the stack s3." << endl;
+      std::cout << "The stack s1 is greater than or equal to "
+                << "the stack s3." << std::endl;
     else
-      cout << "The stack s1 is less than "
-           << "the stack s3." << endl;
+      std::cout << "The stack s1 is less than "
+                << "the stack s3." << std::endl;
 
     // to print out the stack s1 ( by unstacking the elements):
     ft::stack <int>::size_type i_size_s1 = s1.size( );
-    cout << "The stack s1 from the top down is: ( ";
+    std::cout << "The stack s1 from the top down is: ( ";
     unsigned int i;
     for ( i = 1 ; i <= i_size_s1 ; i++ )
     {
-       cout << s1.top( ) << " ";
+       std::cout << s1.top( ) << " ";
        s1.pop( );
     }
-    cout << ")." << endl;
+    std::cout << ")." << std::endl;
     end_test(title);
   }
   {
     std::string title = "operator<= test";
     start_test(title);
-
-    using namespace std;
 
     // Declares stacks with default deque base container
     ft::stack <int> s1, s2, s3;
@@ -824,26 +832,24 @@ int main() {
     s3.push( 10 );
 
     if ( s1 <= s2 )
-      cout << "The stack s1 is less than or equal to "
-           << "the stack s2." << endl;
+      std::cout << "The stack s1 is less than or equal to "
+           << "the stack s2." << std::endl;
     else
-      cout << "The stack s1 is greater than "
-           << "the stack s2." << endl;
+      std::cout << "The stack s1 is greater than "
+           << "the stack s2." << std::endl;
 
     if ( s1 <= s3 )
-      cout << "The stack s1 is less than or equal to "
-           << "the stack s3." << endl;
+      std::cout << "The stack s1 is less than or equal to "
+           << "the stack s3." << std::endl;
     else
-      cout << "The stack s1 is greater than "
-           << "the stack s3." << endl;
+      std::cout << "The stack s1 is greater than "
+           << "the stack s3." << std::endl;
 
     end_test(title);
   }
   {
     std::string title = "operator== test";
     start_test(title);
-
-    using namespace std;
 
     // Declares stacks with vector base containers
     ft::stack <int, ft::vector<int> > s1, s2, s3;
@@ -857,14 +863,14 @@ int main() {
     s3.push( 1 );
 
     if ( s1 == s2 )
-      cout << "The stacks s1 and s2 are equal." << endl;
+      std::cout << "The stacks s1 and s2 are equal." << std::endl;
     else
-      cout << "The stacks s1 and s2 are not equal." << endl;
+      std::cout << "The stacks s1 and s2 are not equal." << std::endl;
 
     if ( s1 == s3 )
-      cout << "The stacks s1 and s3 are equal." << endl;
+      std::cout << "The stacks s1 and s3 are equal." << std::endl;
     else
-      cout << "The stacks s1 and s3 are not equal." << endl;
+      std::cout << "The stacks s1 and s3 are not equal." << std::endl;
 
     end_test(title);
   }
@@ -872,10 +878,8 @@ int main() {
     std::string title = "operator> test";
     start_test(title);
 
-    using namespace std;
-
     // Declares stacks with list base container
-    ft::stack <int, list<int> > s1, s2, s3;
+    ft::stack <int, std::list<int> > s1, s2, s3;
 
     s1.push( 1 );
     s1.push( 2 );
@@ -886,18 +890,18 @@ int main() {
     s3.push( 2 );
 
     if ( s1 > s2 )
-      cout << "The stack s1 is greater than "
-           << "the stack s2." << endl;
+      std::cout << "The stack s1 is greater than "
+           << "the stack s2." << std::endl;
     else
-      cout << "The stack s1 is not greater than "
-           << "the stack s2." << endl;
+      std::cout << "The stack s1 is not greater than "
+           << "the stack s2." << std::endl;
 
     if ( s1> s3 )
-      cout << "The stack s1 is greater than "
-           << "the stack s3." << endl;
+      std::cout << "The stack s1 is greater than "
+           << "the stack s3." << std::endl;
     else
-      cout << "The stack s1 is not greater than "
-           << "the stack s3." << endl;
+      std::cout << "The stack s1 is not greater than "
+           << "the stack s3." << std::endl;
 
     end_test(title);
   }
@@ -905,10 +909,8 @@ int main() {
     std::string title = "operator>= test";
     start_test(title);
 
-    using namespace std;
-
     // Declares stacks with list base container
-    ft::stack <int, list<int> > s1, s2, s3;
+    ft::stack <int, std::list<int> > s1, s2, s3;
 
     s1.push( 1 );
     s1.push( 2 );
@@ -918,18 +920,18 @@ int main() {
     s3.push( 2 );
 
     if ( s1 >= s2 )
-      cout << "The stack s1 is greater than or equal to "
-           << "the stack s2." << endl;
+      std::cout << "The stack s1 is greater than or equal to "
+           << "the stack s2." << std::endl;
     else
-      cout << "The stack s1 is less than "
-           << "the stack s2." << endl;
+      std::cout << "The stack s1 is less than "
+           << "the stack s2." << std::endl;
 
     if ( s1>= s3 )
-      cout << "The stack s1 is greater than or equal to "
-           << "the stack s3." << endl;
+      std::cout << "The stack s1 is greater than or equal to "
+           << "the stack s3." << std::endl;
     else
-      cout << "The stack s1 is less than "
-           << "the stack s3." << endl;
+      std::cout << "The stack s1 is less than "
+           << "the stack s3." << std::endl;
     end_test(title);
   }
 
@@ -1080,20 +1082,27 @@ int main() {
     ft::map<char,int> mymap;
 
     // first insert function version (single parameter):
-    mymap.insert ( ft::pair<char,int>('a',100) );
-    mymap.insert ( ft::pair<char,int>('z',200) );
+    mymap.insert ( ft::make_pair('a',100) );
+    mymap.insert ( ft::make_pair('z',200) );
 
     ft::pair<ft::map<char,int>::iterator,bool> ret;
-    ret = mymap.insert ( ft::pair<char,int>('z',500) );
+    ret = mymap.insert ( ft::make_pair('z',500) );
     if (ret.second==false) {
       std::cout << "element 'z' already existed";
-      std::cout << " with a value of " << ret.first->second << '\n';
+      std::cout << " with a value of " << ret.first->second << "\n\n";
     }
 
     // second insert function version (with hint position):
     ft::map<char,int>::iterator it = mymap.begin();
+
+    std::cout << "print iterator before insert:" << '\n';
+    std::cout << it->first << " => " << it->second << "\n\n";
+
     mymap.insert (it, ft::pair<char,int>('b',300));  // max efficiency inserting
     mymap.insert (it, ft::pair<char,int>('c',400));  // no max efficiency inserting
+
+    std::cout << "print iterator after insert:" << '\n';
+    std::cout << it->first << " => " << it->second << "\n\n";
 
     // third insert function version (range insertion):
     ft::map<char,int> anothermap;
@@ -1127,12 +1136,22 @@ int main() {
     it=mymap.find('b');
     mymap.erase (it);                   // erasing by iterator
 
+    std::cout << "print erased iterator:" << '\n';
+    std::cout << it->first << " => " << it->second << '\n';
+    std::cout << '\n';
+
+    std::cout << "mymap contains:" << '\n';
+    for (it=mymap.begin(); it!=mymap.end(); ++it)
+      std::cout << it->first << " => " << it->second << '\n';
+    std::cout << '\n';
+
     mymap.erase ('c');                  // erasing by key
 
     it=mymap.find ('e');
     mymap.erase ( it, mymap.end() );    // erasing by range
 
     // show content:
+    std::cout << "remaining contents of mymap are:" << '\n';
     for (it=mymap.begin(); it!=mymap.end(); ++it)
       std::cout << it->first << " => " << it->second << '\n';
 
@@ -1385,6 +1404,22 @@ int main() {
 
     std::cout << "bar contains:\n";
     for (ft::map<char,int>::iterator it=bar.begin(); it!=bar.end(); ++it)
+      std::cout << it->first << " => " << it->second << '\n';
+
+    end_test(title);
+  }
+  {
+    std::string title = "duplicate key test";
+    start_test(title);
+
+    ft::map<char,int> foo;
+
+    foo['y']=200;
+    foo['x']=100;
+    foo['x']=42;
+
+    std::cout << "foo contains:\n";
+    for (ft::map<char,int>::iterator it=foo.begin(); it!=foo.end(); ++it)
       std::cout << it->first << " => " << it->second << '\n';
 
     end_test(title);
