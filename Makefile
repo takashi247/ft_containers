@@ -4,6 +4,8 @@ CXX			:= clang++
 
 CXXFLAGS	:= -Wall -Wextra -Werror -MMD -MP -std=c++98 -pedantic
 
+CXXFLAGS_SUB	:= -Wall -Wextra -Werror -std=c++98 -pedantic
+
 SRCSDIR		:= srcs/
 
 OBJSDIR		:= objs/
@@ -72,6 +74,15 @@ time:
 	make -B CXXFLAGS="$(CXXFLAGS) $(TIME) $(STL)"
 	./$(NAME) > stl_out.txt 2> stl_err.txt
 #diff retuns 1 if there are any differences
+	diff ft_out.txt stl_out.txt
+	cat ft_err.txt
+	cat stl_err.txt
+
+subject:		srcs/main_subject.cpp
+	$(CXX) $(CXXFLAGS_SUB) $(INCLUDE) $<
+	./$(NAME) 42 > ft_out.txt 2> ft_err.txt
+	$(CXX) $(CXXFLAGS_SUB) $(STL) $(INCLUDE) $<
+	./$(NAME) 42 > stl_out.txt 2> stl_err.txt
 	diff ft_out.txt stl_out.txt
 	cat ft_err.txt
 	cat stl_err.txt
