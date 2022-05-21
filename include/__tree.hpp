@@ -3,7 +3,7 @@
 
 #include <iterator> // for bidirectional iterator tag
 #include <limits> // for numeric_limits
-#include <algorithm> // for min, swap
+#include <algorithm> // for min
 #include <memory> // for allocator max_size function
 #include <stdexcept> // for length_error, out_of_range
 
@@ -524,9 +524,9 @@ class __tree {
 
   void swap(tree& __x) {
     if (get_allocator() == __x.get_allocator()) {
-      std::swap(__comp_, __x.__comp_);
-      std::swap(__head_, __x.__head_);
-      std::swap(__size_, __x.__size_);
+      ft::swap(__comp_, __x.__comp_);
+      ft::swap(__head_, __x.__head_);
+      ft::swap(__size_, __x.__size_);
     }
   }
 
@@ -925,7 +925,7 @@ class __tree {
         __set_target_right(__target, __node_to_erase);
       }
       __set_target_parent(__target, __node_to_erase);
-      std::swap(__target->__color_, __node_to_erase->__color_);
+      ft::swap(__target->__color_, __node_to_erase->__color_);
     } else {
       __target_parent = __node_to_erase->__parent_;
       __connect_replace_n_parent(__replace, __node_to_erase, __target_parent);

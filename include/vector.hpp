@@ -358,13 +358,13 @@ class vector {
     return __first;
   }
 
-  // Need to check what happens if 2 vectors with different allocators are swapped
+  // If __alloc_ != __x.__alloc_, the behavior is undefined
 
   void swap(vector& __x) {
     if (__alloc_ == __x.__alloc_) {
-      std::swap(__begin_, __x.__begin_);
-      std::swap(__end_, __x.__end_);
-      std::swap(__end_cap_, __x.__end_cap_);
+      ft::swap(__begin_, __x.__begin_);
+      ft::swap(__end_, __x.__end_);
+      ft::swap(__end_cap_, __x.__end_cap_);
     } else {
       vector tmp = *this;
       *this = __x;
