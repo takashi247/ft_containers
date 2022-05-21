@@ -44,6 +44,9 @@ class stack {
 
   void pop() { c.pop_back(); }
 
+  // operator== and operator< need to access to protected variable of stack.
+  // Therefore need to be declared as friend in stack class
+
   template <class T1, class _C1>
   friend
   bool
