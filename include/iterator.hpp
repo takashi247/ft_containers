@@ -52,7 +52,16 @@ class reverse_iterator : public std::iterator<
 
   // Copy constructor
 
-  // TODO: Why don't we need to use enable_if and is_convertible to check if _Up is the valid type?
+  /*
+  ** Q: Why don't we need to use enable_if and is_convertible to check if _Up is the valid type?
+  ** A: reverse_iterator uses iterator_traits and if _Up is not appropriate,
+  ** they don't have proper iterator traits. Therefore, no need to check if _Up is
+  ** proper iterators
+  **
+  ** Q: What happens when initiating reverse_iterator with input_iterator?
+  ** A: Can be initiated but not fully operational as increments and decrements of
+  ** iterators are not supported
+  */
 
   template <class _Up>
   reverse_iterator(const reverse_iterator<_Up>& __u) : current(__u.base()) {}
@@ -123,7 +132,10 @@ class reverse_iterator : public std::iterator<
 
 // Relational operators
 
-// TODO: Why do we need to specify 2 template parameters (i.e., _Iter1 and _Iter2)?
+/*
+** Q: Why do we need to specify 2 template parameters (i.e., _Iter1 and _Iter2)?
+** A: To enable comparison between const iterator and non-const iterator
+*/
 
 template <class _Iter1, class _Iter2>
 bool operator==(const reverse_iterator<_Iter1>& __x, const reverse_iterator<_Iter2>& __y) {
@@ -160,8 +172,6 @@ reverse_iterator<_Iter>
 operator+(typename reverse_iterator<_Iter>::difference_type __n, const reverse_iterator<_Iter>& __x) {
   return reverse_iterator<_Iter>(__x.base() - __n);
 }
-
-// TODO: Confirm if it's ok to use difference_type of _Iter1 for the type of the returned value
 
 template <class _Iter1, class _Iter2>
 typename reverse_iterator<_Iter1>::difference_type

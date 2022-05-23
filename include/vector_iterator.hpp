@@ -30,7 +30,10 @@ class vector_iterator {
 
   // Copy constructor and assignation operator
 
-  // TODO: Do we need to use enable_if and is_convertible to check if _Up is valid parameter?
+  // Q: Do we need to use enable_if and is_convertible to check if _Up is valid parameter?
+  // A: No. vector_iterator is only used as a wrapper of a pointer in the vector header file
+  //    Therefore, _Up is secured to be some kind of pointers and don't need to
+  //    be verified here
 
   template <class _Up>
   vector_iterator(const vector_iterator<_Up>& __u) : __i_(__u.base()) {}
@@ -81,11 +84,11 @@ class vector_iterator {
     return *this;
   }
 
-  // TODO:
+  // Q:
   // Should this return a reference of vector_iterator?
   // How does __v can be lived outside this function? Is that beyond the scope of __v?
 
-  // ANSWER:
+  // A:
   // The returned value should not be a reference as the returned value from + operator should be rvalue
   // The function will return the copy of __v so the returned value should be lived outside of the function
 
@@ -131,7 +134,9 @@ bool operator<=(const vector_iterator<_Iter1>& __x, const vector_iterator<_Iter2
   return !(__y < __x);
 }
 
-// TODO: Why don't we need operator+ version of this non-member overloads?
+// Q: Why don't we need operator+ version of this non-member overloads?
+// A: operator- is required for calculating a distance between 2 random access iterators
+//    operator+, however, is not required for any operations using random access iterators
 
 template <class _Iter1, class _Iter2>
 typename vector_iterator<_Iter1>::difference_type
@@ -139,7 +144,8 @@ operator-(const vector_iterator<_Iter1>& __x, const vector_iterator<_Iter2>& __y
   return __x.base() - __y.base();
 }
 
-// TODO: Why don't we need operator- version of this non-member overloads?
+// Q: Why don't we need operator- version of this non-member overloads?
+// A: Because 10 - it does not make sense (while 10 + it can be reasonable)
 
 template <class _Iter>
 vector_iterator<_Iter>
