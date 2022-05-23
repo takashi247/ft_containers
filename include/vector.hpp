@@ -83,8 +83,9 @@ class vector {
   }
 
   template <class _Iterator>
-  vector(_Iterator __first, _Iterator __last, const allocator_type& __a,
-         typename ft::enable_if<!ft::is_integral<_Iterator>::value, _Iterator>::type*)
+  vector(_Iterator __first,
+         typename ft::enable_if<!ft::is_integral<_Iterator>::value, _Iterator>::type __last,
+         const allocator_type& __a)
     : __begin_(NULL), __end_(NULL), __end_cap_(NULL), __alloc_(__a) {
     insert(begin(), __first, __last);
   }
