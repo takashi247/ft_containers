@@ -627,19 +627,24 @@ int main() {
     std::string title = "iterator comparison test";
     start_test(title);
 
-    ft::vector<int> vec;
-
-    for (int i = 0; i < 10; ++i) {
-      vec.push_back(i);
+    ft::vector<double> v_d(3);
+    v_d[0] = 0.1;
+    v_d[1] = 2.123;
+    v_d[2] = 12.3;
+    ft::vector<double>::reverse_iterator revit_end = v_d.rend();
+    ft::vector<double>::const_reverse_iterator revit = v_d.rbegin();
+    while (revit != revit_end)
+    {
+    	std::cout << "rev_end - const_rev -> " << (revit_end - revit) << std::endl;
+    	// std::cout << "rev_end + const_rev -> " << (revit_end + revit) << std::endl; // does not compile!
+    	std::cout << "rev < const_rev -> " << (revit_end < revit) << std::endl;
+    	std::cout << "rev > const_rev -> " << (revit_end > revit) << std::endl;
+    	std::cout << "rev <= const_rev -> " << (revit_end <= revit) << std::endl;
+    	std::cout << "rev >= const_rev -> " << (revit_end >= revit) << std::endl;
+    	std::cout << ' ' << *revit++;
     }
-    ft::vector<int>::iterator it = vec.begin();
-    ft::vector<int>::iterator end = vec.end();
-    ft::vector<int>::const_iterator c_end = end;
-    print_container(it, end);
-    for (; it < c_end; ++it) {
-      std::cout << ' ' << *it;
-    }
-    std::cout << '\n';
+    revit = revit_end;
+    std::cout << std::endl;
 
     end_test(title);
   }
