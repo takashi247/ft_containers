@@ -44,7 +44,7 @@ class vector_iterator {
     return *this;
   }
 
-  virtual ~vector_iterator(){}
+  ~vector_iterator(){}
 
   reference operator*() const { return *__i_; }
 

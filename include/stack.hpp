@@ -8,8 +8,8 @@ namespace ft {
 template <class _Tp, class _Container = ft::vector<_Tp> >
 class stack {
  public:
+  typedef _Tp                                      value_type;
   typedef _Container                               container_type;
-  typedef typename container_type::value_type      value_type;
   typedef typename container_type::size_type       size_type;
 
  protected:
@@ -21,8 +21,6 @@ class stack {
 
   explicit stack(const container_type& __c) : c(__c) {}
 
-  stack(const stack& __q) : c(__q.c) {}
-
   stack& operator=(const stack& __q) {
     if (this != &__q) {
       c = __q.c;
@@ -30,7 +28,7 @@ class stack {
     return *this;
   }
 
-  virtual ~stack() {}
+  ~stack() {}
 
   bool empty() const { return c.empty(); }
 

@@ -24,8 +24,8 @@ class map {
   typedef typename allocator_type::const_reference           const_reference;
   typedef typename allocator_type::pointer                   pointer;
   typedef typename allocator_type::const_pointer             const_pointer;
-  typedef typename allocator_type::size_type                 size_type;
   typedef typename allocator_type::difference_type           difference_type;
+  typedef typename allocator_type::size_type                 size_type;
 
   // Q: Understand why "friend class map" is needed here
   // A: Because map class needs to have access to a protected constructor of value_compare
@@ -61,9 +61,6 @@ class map {
   explicit map(const key_compare& __comp)
     : __tree_(__comp, allocator_type()) {}
 
-  explicit map(const allocator_type& __a)
-    : __tree_(key_compare(), __a) {}
-
   map(const key_compare& __comp, const allocator_type& __a)
     : __tree_(__comp, __a) {}
 
@@ -77,7 +74,7 @@ class map {
 
   map(const map& __m) : __tree_(__m.__tree_) {}
 
-  virtual ~map() {}
+  ~map() {}
 
   map& operator=(const map& __m) {
     if (this != &__m) {
@@ -173,11 +170,11 @@ class map {
 
   const_iterator upper_bound(const key_type& __k) const { return __tree_.upper_bound(__k); }
 
-  ft::pair<const_iterator, const_iterator> equal_range(const key_type& __k) const {
+  ft::pair<iterator, iterator> equal_range(const key_type& __k) {
     return __tree_.equal_range(__k);
   }
 
-  ft::pair<iterator, iterator> equal_range(const key_type& __k) {
+  ft::pair<const_iterator, const_iterator> equal_range(const key_type& __k) const {
     return __tree_.equal_range(__k);
   }
 
@@ -199,7 +196,7 @@ class map {
 // Non-member functions
 
 template <class _Key, class _Tp, class _Compare, class _Allocator>
-inline bool operator==(const map<_Key, _Tp, _Compare, _Allocator>& __x,
+bool operator==(const map<_Key, _Tp, _Compare, _Allocator>& __x,
                        const map<_Key, _Tp, _Compare, _Allocator>& __y) {
   return __x.__tree_ == __y.__tree_;
 }
@@ -211,7 +208,7 @@ inline bool operator!=(const map<_Key, _Tp, _Compare, _Allocator>& __x,
 }
 
 template <class _Key, class _Tp, class _Compare, class _Allocator>
-inline bool operator<(const map<_Key, _Tp, _Compare, _Allocator>& __x,
+bool operator<(const map<_Key, _Tp, _Compare, _Allocator>& __x,
                       const map<_Key, _Tp, _Compare, _Allocator>& __y) {
   return __x.__tree_ < __y.__tree_;
 }

@@ -320,7 +320,7 @@ class __tree {
     __copy(__t);
   }
 
-  virtual ~__tree() {
+  ~__tree() {
     erase(begin(), end());
     __destnode(__head_);
     __head_ = NULL;

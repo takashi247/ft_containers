@@ -24,8 +24,8 @@ class set {
   typedef typename allocator_type::const_reference           const_reference;
   typedef typename allocator_type::pointer                   pointer;
   typedef typename allocator_type::const_pointer             const_pointer;
-  typedef typename allocator_type::size_type                 size_type;
   typedef typename allocator_type::difference_type           difference_type;
+  typedef typename allocator_type::size_type                 size_type;
 
  private:
 
@@ -46,9 +46,6 @@ class set {
   explicit set(const key_compare& __comp)
     : __tree_(__comp, allocator_type()) {}
 
-  explicit set(const allocator_type& __a)
-    : __tree_(key_compare(), __a) {}
-
   set(const key_compare& __comp, const allocator_type& __a)
     : __tree_(__comp, __a) {}
 
@@ -62,7 +59,7 @@ class set {
 
   set(const set& __m) : __tree_(__m.__tree_) {}
 
-  virtual ~set() {}
+  ~set() {}
 
   set& operator=(const set& __m) {
     if (this != &__m) {
@@ -132,7 +129,7 @@ class set {
 
   key_compare key_comp() const { return __tree_.key_comp(); }
 
-  value_compare value_comp() const { return value_compare(__tree_.key_comp()); }
+  value_compare value_comp() const { return __tree_.key_comp(); }
 
   // Operations
 
@@ -150,11 +147,11 @@ class set {
 
   const_iterator upper_bound(const key_type& __k) const { return __tree_.upper_bound(__k); }
 
-  ft::pair<const_iterator, const_iterator> equal_range(const key_type& __k) const {
+  ft::pair<iterator, iterator> equal_range(const key_type& __k) {
     return __tree_.equal_range(__k);
   }
 
-  ft::pair<iterator, iterator> equal_range(const key_type& __k) {
+  ft::pair<const_iterator, const_iterator> equal_range(const key_type& __k) const {
     return __tree_.equal_range(__k);
   }
 
@@ -176,7 +173,7 @@ class set {
 // Non-member functions
 
 template <class _Key, class _Compare, class _Allocator>
-inline bool operator==(const set<_Key, _Compare, _Allocator>& __x,
+bool operator==(const set<_Key, _Compare, _Allocator>& __x,
                        const set<_Key, _Compare, _Allocator>& __y) {
   return __x.__tree_ == __y.__tree_;
 }
@@ -188,7 +185,7 @@ inline bool operator!=(const set<_Key, _Compare, _Allocator>& __x,
 }
 
 template <class _Key, class _Compare, class _Allocator>
-inline bool operator<(const set<_Key, _Compare, _Allocator>& __x,
+bool operator<(const set<_Key, _Compare, _Allocator>& __x,
                       const set<_Key, _Compare, _Allocator>& __y) {
   return __x.__tree_ < __y.__tree_;
 }

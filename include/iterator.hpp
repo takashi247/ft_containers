@@ -109,6 +109,8 @@ class reverse_iterator : public std::iterator<
   template <class _Up>
   reverse_iterator(const reverse_iterator<_Up>& __u) : current(__u.base()) {}
 
+  ~reverse_iterator() {}
+
   template <class _Up>
   reverse_iterator& operator=(const reverse_iterator<_Up>& __u) {
     current = __u.base();

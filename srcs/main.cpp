@@ -656,7 +656,7 @@ int main() {
     	std::cout << "rev > const_rev -> " << (revit_end > revit) << std::endl;
     	std::cout << "rev <= const_rev -> " << (revit_end <= revit) << std::endl;
     	std::cout << "rev >= const_rev -> " << (revit_end >= revit) << std::endl;
-    	std::cout << ' ' << *revit++;
+    	std::cout << ' ' << *revit++ << '\n';
     }
     revit = revit_end;
     std::cout << std::endl;

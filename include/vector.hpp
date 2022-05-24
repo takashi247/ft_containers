@@ -23,14 +23,14 @@ class vector {
   typedef _Allocator                                    allocator_type;
   typedef typename allocator_type::reference            reference;
   typedef typename allocator_type::const_reference      const_reference;
-  typedef typename allocator_type::size_type            size_type;
-  typedef typename allocator_type::difference_type      difference_type;
   typedef typename allocator_type::pointer              pointer;
   typedef typename allocator_type::const_pointer        const_pointer;
   typedef typename ft::vector_iterator<pointer>         iterator;
   typedef typename ft::vector_iterator<const_pointer>   const_iterator;
   typedef typename ft::reverse_iterator<iterator>       reverse_iterator;
   typedef typename ft::reverse_iterator<const_iterator> const_reverse_iterator;
+  typedef typename allocator_type::difference_type      difference_type;
+  typedef typename allocator_type::size_type            size_type;
 
  private:
   pointer __begin_;
@@ -42,30 +42,14 @@ class vector {
 
   // Default constructor
 
-  vector()
-    : __begin_(NULL), __end_(NULL), __end_cap_(NULL), __alloc_() {}
-
-  explicit vector(const allocator_type& __a)
+  explicit vector(const allocator_type& __a = allocator_type())
     : __begin_(NULL), __end_(NULL), __end_cap_(NULL), __alloc_(__a) {}
 
 
   // Fill constructor
 
-  explicit vector(size_type __n) {
-    if (0 < __n) {
-      __allocate(__n);
-      __end_ = __construct_to_fill(__begin_, __n, value_type());
-    }
-  }
-
-  vector(size_type __n, const_reference __x) {
-    if (0 < __n) {
-      __allocate(__n);
-      __end_ = __construct_to_fill(__begin_, __n, __x);
-    }
-  }
-
-  vector(size_type __n, const_reference __x, const allocator_type& __a)
+  vector(size_type __n, const_reference __x = value_type(),
+         const allocator_type& __a = allocator_type())
     : __alloc_(__a) {
     if (0 < __n) {
       __allocate(__n);
@@ -77,15 +61,8 @@ class vector {
 
   template <class _Iterator>
   vector(_Iterator __first,
-         typename ft::enable_if<!ft::is_integral<_Iterator>::value, _Iterator>::type __last)
-    : __begin_(NULL), __end_(NULL), __end_cap_(NULL), __alloc_() {
-    insert(begin(), __first, __last);
-  }
-
-  template <class _Iterator>
-  vector(_Iterator __first,
          typename ft::enable_if<!ft::is_integral<_Iterator>::value, _Iterator>::type __last,
-         const allocator_type& __a)
+         const allocator_type& __a = allocator_type())
     : __begin_(NULL), __end_(NULL), __end_cap_(NULL), __alloc_(__a) {
     insert(begin(), __first, __last);
   }
@@ -102,7 +79,7 @@ class vector {
 
   // Destructor
 
-  virtual ~vector() {
+  ~vector() {
     if (__begin_ != NULL) {
       clear();
       __deallocate();
