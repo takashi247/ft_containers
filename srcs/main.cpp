@@ -1444,6 +1444,27 @@ int main() {
 
     end_test(title);
   }
+  {
+    std::string title = "comparison of const/non-const iterators";
+    start_test(title);
+
+    ft::map<char,int> mymap;
+
+    mymap['a']=20;
+    mymap['b']=40;
+    mymap['c']=60;
+    mymap['d']=80;
+    mymap['e']=100;
+
+    ft::map<char,int>::iterator it = mymap.begin();
+    ft::map<char,int>::const_iterator end = mymap.end();
+
+    for (; it != end; ++it)
+      std::cout << it->first << " => " << it->second << '\n';
+    std::cout << std::endl;
+
+    end_test(title);
+  }
 
   std::cout << "=====Set test=====\n" << std::endl;
 

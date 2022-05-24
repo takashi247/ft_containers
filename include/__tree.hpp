@@ -244,6 +244,20 @@ class __tree_const_iterator {
 
 }; // __tree_const_iterator
 
+// Comparison of non-const iterator and const iterator
+
+template <class _TreeTraits>
+bool operator==(const __tree_iterator<_TreeTraits>& __x,
+                const __tree_const_iterator<_TreeTraits>& __y) {
+  return __x.base() == __y.base();
+}
+
+template <class _TreeTraits>
+bool operator!=(const __tree_iterator<_TreeTraits>& __x,
+                const __tree_const_iterator<_TreeTraits>& __y) {
+  return !(__x == __y);
+}
+
 template <class _TreeTraits>
 class __tree {
 
