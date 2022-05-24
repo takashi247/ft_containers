@@ -105,7 +105,9 @@ class set {
   }
 
   template <class _InputIterator>
-  void insert(_InputIterator __first, _InputIterator __last) {
+  void insert(_InputIterator __first,
+              typename ft::enable_if<!ft::is_integral<_InputIterator>::value,
+                                     _InputIterator>::type __last) {
     __tree_.insert(__first, __last);
   }
 
@@ -129,7 +131,7 @@ class set {
 
   key_compare key_comp() const { return __tree_.key_comp(); }
 
-  value_compare value_comp() const { return __tree_.key_comp(); }
+  value_compare value_comp() const { return value_compare(__tree_.key_comp()); }
 
   // Operations
 

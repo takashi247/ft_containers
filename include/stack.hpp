@@ -21,6 +21,8 @@ class stack {
 
   explicit stack(const container_type& __c) : c(__c) {}
 
+  ~stack() {}
+
   stack& operator=(const stack& __q) {
     if (this != &__q) {
       c = __q.c;

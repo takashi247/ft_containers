@@ -156,14 +156,10 @@ class vector {
                                std::numeric_limits<difference_type>::max());
   }
 
-  void resize(size_type __sz) {
-    resize(__sz, value_type());
-  }
-
-  void resize(size_type __sz, const_reference __x) {
+  void resize(size_type __sz, value_type __val = value_type()) {
     size_type __cs = size();
     if (__cs < __sz) {
-      insert(end(), __sz - __cs, __x);
+      insert(end(), __sz - __cs, __val);
     } else if (__sz < __cs) {
       erase(begin() + __sz, end());
     }
@@ -247,22 +243,22 @@ class vector {
     insert(begin(), __first, __last);
   }
 
-  void assign(size_type __n, const_reference __u) {
+  void assign(size_type __n, const value_type& __val) {
     erase(begin(), end());
-    insert(begin(), __n, __u);
+    insert(begin(), __n, __val);
   }
 
-  void push_back(const_reference __x) { insert(end(), __x); }
+  void push_back(const value_type& __val) { insert(end(), __val); }
 
   void pop_back() { erase(end() - 1); }
 
-  iterator insert(iterator __position, const_reference __x) {
+  iterator insert(iterator __position, const value_type& __val) {
     size_type __off = size() == 0 ? 0 : __position - begin();
-    insert(__position, static_cast<size_type>(1), __x);
+    insert(__position, static_cast<size_type>(1), __val);
     return begin() + __off;
   }
 
-  void insert(iterator __position, size_type __n, const_reference __x) {
+  void insert(iterator __position, size_type __n, const value_type& __x) {
     size_type __cap = capacity();
     size_type __s = size();
     size_type __ms = max_size();
@@ -314,11 +310,11 @@ class vector {
   // Q: Why input iterators need to be handled separately?
   // A: As input iterators are not supported by std::distance
 
-  template <class _Iterator>
-  void insert(iterator __position, _Iterator __first,
-              typename ft::enable_if<!ft::is_integral<_Iterator>::value, _Iterator>::type __last) {
+  template <class _InputIterator>
+  void insert(iterator __position, _InputIterator __first,
+              typename ft::enable_if<!ft::is_integral<_InputIterator>::value, _InputIterator>::type __last) {
       __insert_range(__position, __first, __last,
-                     typename ft::iterator_traits<_Iterator>::iterator_category());
+                     typename ft::iterator_traits<_InputIterator>::iterator_category());
   }
 
   iterator erase(iterator __position) {
@@ -337,18 +333,11 @@ class vector {
     return __first;
   }
 
-  // If __alloc_ != __x.__alloc_, the behavior is undefined
-
   void swap(vector& __x) {
-    if (__alloc_ == __x.__alloc_) {
-      ft::swap(__begin_, __x.__begin_);
-      ft::swap(__end_, __x.__end_);
-      ft::swap(__end_cap_, __x.__end_cap_);
-    } else {
-      vector tmp = *this;
-      *this = __x;
-      __x = tmp;
-    }
+    ft::swap(__begin_, __x.__begin_);
+    ft::swap(__end_, __x.__end_);
+    ft::swap(__end_cap_, __x.__end_cap_);
+    ft::swap(__alloc_, __x.__alloc_);
   }
 
   void clear() {

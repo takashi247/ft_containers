@@ -10,7 +10,8 @@
 #include "iterator.hpp"
 #include "utility.hpp"
 #include "iterator_traits.hpp"
-#include "algorithm.hpp"
+#include "algorithm.hpp" // for swap
+#include "type_traits.hpp" // for enable_if and is_integral
 
 namespace ft {
 
@@ -537,11 +538,12 @@ class __tree {
   }
 
   void swap(tree& __x) {
-    if (get_allocator() == __x.get_allocator()) {
-      ft::swap(__comp_, __x.__comp_);
-      ft::swap(__head_, __x.__head_);
-      ft::swap(__size_, __x.__size_);
-    }
+    ft::swap(__head_, __x.__head_);
+    ft::swap(__size_, __x.__size_);
+    ft::swap(__comp_, __x.__comp_);
+    ft::swap(__alloc_value_, __x.__alloc_value_);
+    ft::swap(__alloc_node_, __x.__alloc_node_);
+    ft::swap(__alloc_node_pointer_, __x.__alloc_node_pointer_);
   }
 
  protected:
