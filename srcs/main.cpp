@@ -32,7 +32,7 @@ void print_container(_Iter __first, _Iter __last) {
 }
 
 void start_test(std::string __title) {
-  std::cout << "***" << __title << "***\n" << std::endl;
+  std::cout << "---" << __title << "---\n" << std::endl;
   time_start = clock();
 }
 
@@ -394,6 +394,21 @@ int main() {
     for (it=myvector.begin(); it<myvector.end(); it++)
       std::cout << ' ' << *it;
     std::cout << '\n';
+
+    std::cout << "myvector's size: " << myvector.size() << '\n';
+    std::cout << "myvector's capacity: " << myvector.capacity() << '\n';
+    std::cout << "myvector's max_size: " << myvector.max_size() << '\n';
+
+    myvector.insert (myvector.end(), myarray, myarray+3);
+
+    std::cout << "myvector contains:";
+    for (it=myvector.begin(); it<myvector.end(); it++)
+      std::cout << ' ' << *it;
+    std::cout << '\n';
+
+    std::cout << "myvector's size: " << myvector.size() << '\n';
+    std::cout << "myvector's capacity: " << myvector.capacity() << '\n';
+    std::cout << "myvector's max_size: " << myvector.max_size() << '\n';
 
     end_test(title);
   }
