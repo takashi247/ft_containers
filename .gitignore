@@ -41,6 +41,4 @@ ref/
 *.txt
 
 # Testers
-ft_containers-tester-42/
-old_log/
 test_*/
