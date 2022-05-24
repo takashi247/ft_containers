@@ -464,7 +464,7 @@ class vector {
     } else if (__ms - __s < static_cast<size_type>(__n)) {
       __throw_length_error();
     } else if (__cap < __s + __n) {
-      __cap = __ms - __cap / 2 < __cap ? 0 : __cap + __cap / 2;
+      __cap = __ms - __cap < __cap ? 0 : __cap + __cap;
       if (__cap < __s + __n) {
         __cap = __s + __n;
       }
