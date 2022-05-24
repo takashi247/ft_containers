@@ -6,6 +6,47 @@
 
 namespace ft {
 
+// ft::advance
+
+template <class _InputIter>
+void __advance(_InputIter& __i,
+               typename iterator_traits<_InputIter>::difference_type __n,
+               std::input_iterator_tag) {
+  for (; 0 < __n; --__n) {
+    ++__i;
+  }
+}
+
+template <class _BiDirIter>
+void __advance(_BiDirIter& __i,
+               typename iterator_traits<_BiDirIter>::difference_type __n,
+               std::bidirectional_iterator_tag) {
+  if (0 <= __n) {
+    for (; 0 < __n; --__n) {
+      ++__i;
+    }
+  } else {
+    for (; __n < 0; ++__n) {
+      --__i;
+    }
+  }
+}
+
+template <class _RandIter>
+void __advance(_RandIter& __i,
+               typename iterator_traits<_RandIter>::difference_type __n,
+               std::random_access_iterator_tag) {
+  __i += __n;
+}
+
+template <class _InputIter>
+void advance(_InputIter& __i,
+             typename ft::iterator_traits<_InputIter>::difference_type __n) {
+  ft::__advance(__i, __n, typename ft::iterator_traits<_InputIter>::iterator_category());
+}
+
+// ft::distance
+
 template <class _InputIter>
 typename ft::iterator_traits<_InputIter>::difference_type
 __distance(_InputIter __first, _InputIter __last, std::input_iterator_tag) {
@@ -27,6 +68,8 @@ typename ft::iterator_traits<_InputIter>::difference_type
 distance(_InputIter __first, _InputIter __last) {
   return ft::__distance(__first, __last, typename ft::iterator_traits<_InputIter>::iterator_category());
 }
+
+// ft::reverse_iterator
 
 template <class _Iter>
 class reverse_iterator : public std::iterator<

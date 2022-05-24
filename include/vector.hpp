@@ -329,12 +329,13 @@ class vector {
     } else {
       iterator __old_end = end();
       __end_ = __construct_to_copy(__old_end - __n, __old_end, __end_);
-      std::copy_backward(__position, __old_end - __n, __old_end);
+      __copy_backward(__position, __old_end - __n, __old_end);
       std::fill(__position, __position + __n, __x);
     }
   }
 
-  // TODO: Why input iterators need to be handled separately?
+  // Q: Why input iterators need to be handled separately?
+  // A: As input iterators are not supported by std::distance
 
   template <class _Iterator>
   void insert(iterator __position, _Iterator __first,
@@ -489,7 +490,7 @@ class vector {
     } else if (end() - __position < __n) {
       __construct_to_copy(__position, end(), &(*__position) + __n);
       _Iterator __middle = __first;
-      std::advance(__middle, end() - __position);
+      ft::advance(__middle, end() - __position);
       try {
         __construct_to_copy(__middle, __last, __end_);
       } catch (...) {
@@ -501,8 +502,14 @@ class vector {
     } else if (0 < __n) {
       iterator __old_end = end();
       __end_ = __construct_to_copy(__old_end - __n, __old_end, __end_);
-      std::copy_backward(__position, __old_end - __n, __old_end);
+      __copy_backward(__position, __old_end - __n, __old_end);
       std::copy(__first, __last, __position);
+    }
+  }
+
+  void __copy_backward(iterator __first, iterator __last, iterator __result) {
+    while (__last != __first) {
+      *(--__result) = *(--__last);
     }
   }
 

@@ -27,7 +27,8 @@ class map {
   typedef typename allocator_type::size_type                 size_type;
   typedef typename allocator_type::difference_type           difference_type;
 
-  // TODO: Understand why "friend class map" is needed here
+  // Q: Understand why "friend class map" is needed here
+  // A: Because map class needs to have access to a protected constructor of value_compare
 
   class value_compare
     : public std::binary_function<value_type, value_type, bool> {
