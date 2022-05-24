@@ -1156,10 +1156,6 @@ int main() {
     it=mymap.find('b');
     mymap.erase (it);                   // erasing by iterator
 
-    std::cout << "print erased iterator:" << '\n';
-    std::cout << it->first << " => " << it->second << '\n';
-    std::cout << '\n';
-
     std::cout << "mymap contains:" << '\n';
     for (it=mymap.begin(); it!=mymap.end(); ++it)
       std::cout << it->first << " => " << it->second << '\n';
