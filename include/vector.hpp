@@ -60,9 +60,9 @@ class vector {
   // Range constructor
 
   template <class _Iterator>
-  vector(_Iterator __first,
-         typename ft::enable_if<!ft::is_integral<_Iterator>::value, _Iterator>::type __last,
-         const allocator_type& __a = allocator_type())
+  vector(_Iterator __first, _Iterator __last,
+         const allocator_type& __a = allocator_type(),
+         typename ft::enable_if<!ft::is_integral<_Iterator>::value>::type* = NULL)
     : __begin_(NULL), __end_(NULL), __end_cap_(NULL), __alloc_(__a) {
     insert(begin(), __first, __last);
   }
@@ -237,8 +237,9 @@ class vector {
   // Modifiers
 
   template <class _Iterator>
-  void assign(_Iterator __first,
-              typename ft::enable_if<!ft::is_integral<_Iterator>::value, _Iterator>::type __last) {
+  typename ft::enable_if<!ft::is_integral<_Iterator>::value, void>::type
+  assign(_Iterator __first,
+         _Iterator __last) {
     erase(begin(), end());
     insert(begin(), __first, __last);
   }
@@ -311,10 +312,10 @@ class vector {
   // A: As input iterators are not supported by std::distance
 
   template <class _InputIterator>
-  void insert(iterator __position, _InputIterator __first,
-              typename ft::enable_if<!ft::is_integral<_InputIterator>::value, _InputIterator>::type __last) {
-      __insert_range(__position, __first, __last,
-                     typename ft::iterator_traits<_InputIterator>::iterator_category());
+  typename ft::enable_if<!ft::is_integral<_InputIterator>::value, void>::type
+  insert(iterator __position, _InputIterator __first, _InputIterator __last) {
+    __insert_range(__position, __first, __last,
+                   typename ft::iterator_traits<_InputIterator>::iterator_category());
   }
 
   iterator erase(iterator __position) {

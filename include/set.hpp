@@ -105,9 +105,8 @@ class set {
   }
 
   template <class _InputIterator>
-  void insert(_InputIterator __first,
-              typename ft::enable_if<!ft::is_integral<_InputIterator>::value,
-                                     _InputIterator>::type __last) {
+  typename ft::enable_if<!ft::is_integral<_InputIterator>::value, void>::type
+  insert(_InputIterator __first, _InputIterator __last) {
     __tree_.insert(__first, __last);
   }
 

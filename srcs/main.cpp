@@ -87,6 +87,29 @@ int main() {
 
     std::cout << "The contents of fifth are:";
     print_container(fifth.begin(), fifth.end());
+
+    end_test(title);
+  }
+  {
+    std::string title = "constructor test";
+    start_test(title);
+    ft::vector<const char*> first;                                // empty vector of ints
+    ft::vector<const char*> second (4,"hoge");                       // four ints with value 100
+    ft::vector<const char*> third (second.begin(),second.end());  // iterating through second
+    ft::vector<const char*> fourth (third);                       // a copy of third
+
+    print_container(first.begin(), first.end());
+    print_container(second.begin(), second.end());
+    print_container(third.begin(), third.end());
+    print_container(fourth.begin(), fourth.end());
+
+    // the iterator constructor can also be used to construct from arrays:
+    const char* myints[] = {"abc", "def", "ghi", "jkl"};
+    ft::vector<const char*> fifth (myints, myints + sizeof(myints) / sizeof(const char*) );
+
+    std::cout << "The contents of fifth are:";
+    print_container(fifth.begin(), fifth.end());
+
     end_test(title);
   }
   {
